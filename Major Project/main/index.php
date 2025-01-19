@@ -53,7 +53,7 @@ if (!isset($_SESSION['username'])) {
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
       <a class="navbar-brand page-scroll" href="#page-top">BuildWise</a>
      
-      <div class="phone"><span> <?php echo $_SESSION['username']; ?> Build your</span>dream house </div>
+      <div class="phone"><span>  Build your</span>dream house </div>
     </div>
     
     <!-- Collect the nav links, forms, and other content for toggling -->
