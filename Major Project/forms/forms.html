@@ -5,39 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Low-Cost Housing Calculator</title>
     <link rel="stylesheet" href="styles.css">
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+    const districtSelect = document.getElementById("district");
+
+    // Fetch districts on page load
+    try {
+        const response = await fetch("get_locations.php");
+        const districts = await response.json();
+
+        districts.forEach(district => {
+            const option = document.createElement("option");
+            option.value = district.id; // Use district ID as the value
+            option.textContent = district.name; // Display district name
+            districtSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Error fetching districts:", error);
+    }
+});
+
+async function fetchLocations() {
+    const districtId = document.getElementById("district").value;
+    const locationSelect = document.getElementById("location");
+
+    // Clear existing options
+    locationSelect.innerHTML = '<option value="">Select Location</option>';
+
+    if (districtId) {
+        try {
+            const response = await fetch(`get_locations.php?district_id=${encodeURIComponent(districtId)}`);
+            const locations = await response.json();
+
+            locations.forEach(location => {
+                const option = document.createElement("option");
+                option.value = location;
+                option.textContent = location;
+                locationSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error fetching locations:", error);
+        }
+    }
+}
+
+    </script>
 </head>
 <body>
     <div class="container">
         <h1>Find Out How Much Your Home-building Project Will Cost</h1>
         <form class="calculator-form">
+            
             <div class="form-group">
-                <label for="state">Select District</label>
-                <select id="state" name="state">
+                <label for="district">Select District</label>
+                <select id="district" name="district" onchange="fetchLocations()">
                     <option value="">Select District</option>
-<option value="Alappuzha">Alappuzha</option>
-<option value="Ernakulam">Ernakulam</option>
-<option value="Idukki">Idukki</option>
-<option value="Kannur">Kannur</option>
-<option value="Kasaragod">Kasaragod</option>
-<option value="Kollam">Kollam</option>
-<option value="Kottayam">Kottayam</option>
-<option value="Kozhikode">Kozhikode</option>
-<option value="Malappuram">Malappuram</option>
-<option value="Palakkad">Palakkad</option>
-<option value="Pathanamthitta">Pathanamthitta</option>
-<option value="Thrissur">Thrissur</option>
-<option value="Thiruvananthapuram">Thiruvananthapuram</option>
-<option value="Wayanad">Wayanad</option>
-                    <!-- Add more options as required -->
+                    <!-- Districts will populate dynamically with IDs as values -->
                 </select>
             </div>
             <div class="form-group">
-                <label for="city">Select Location</label>
-                <select id="city" name="city">
+                <label for="location">Select Location</label>
+                <select id="location" name="location">
                     <option value="">Select Location</option>
-                    <!-- Add more options as required -->
+                    <!-- Locations will populate dynamically based on district ID -->
                 </select>
             </div>
+            
+            
             <div class="form-group">
                 <label for="area">Area</label>
                 <div class="area-input">
@@ -53,15 +87,15 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="city">Residential Building</label>
-                <select id="city" name="city">
-                    <option value="">1 BHK</option>
-                    <option value="">2 BHK</option>
-                    <!-- Add more options as required -->
+                <label for="residential">Residential Building</label>
+                <select id="residential" name="residential">
+                    <option value="1bhk">1 BHK</option>
+                    <option value="2bhk">2 BHK</option>
+                    <option value="3bhk">3 BHK</option>
+                    <option value="4bhk">4 BHK</option>
                 </select>
             </div>
-            
-            <button type="submit" class="next-button">Estimate Cost➝</button>
+            <button type="submit" class="next-button">Estimate Cost ➝</button>
         </form>
     </div>
 </body>
