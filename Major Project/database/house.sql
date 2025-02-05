@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 26, 2025 at 07:37 AM
+-- Generation Time: Feb 05, 2025 at 04:39 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -28,54 +28,52 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `districts` (
-  `id` int(11) NOT NULL,
-  `dis` varchar(30) NOT NULL
+  `district_id` int(11) NOT NULL,
+  `district_name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `districts`
 --
 
-INSERT INTO `districts` (`id`, `dis`) VALUES
-(1, 'Alappuzha'),
-(2, 'Ernakulam'),
-(3, 'Idukki'),
-(4, 'Kannur'),
-(5, 'Kasaragod'),
-(6, 'Kollam'),
-(7, 'Kottayam'),
-(8, 'Kozhikode'),
-(9, 'Malappuram'),
-(10, 'Palakkad'),
-(11, 'Pathanamthitta'),
-(12, 'Thiruvananthapuram'),
-(13, 'Thrissur'),
-(14, 'Wayanad');
+INSERT INTO `districts` (`district_id`, `district_name`) VALUES
+(1, 'Thrissur');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `location`
+-- Table structure for table `materials`
 --
 
-CREATE TABLE `location` (
-  `id` int(11) NOT NULL,
-  `locations` varchar(30) NOT NULL,
-  `district_id` int(11) NOT NULL
+CREATE TABLE `materials` (
+  `material_id` int(11) NOT NULL,
+  `material_name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `location`
+-- Table structure for table `material_prices`
 --
 
-INSERT INTO `location` (`id`, `locations`, `district_id`) VALUES
-(1, 'Chalakudi', 13),
-(2, 'Mala', 13),
-(3, 'Kodungallur', 13),
-(4, 'Irinjalakuda', 13),
-(5, 'Puthukkad', 13),
-(6, 'Wadakkanchery', 13),
-(7, 'Kunnamkulam', 13);
+CREATE TABLE `material_prices` (
+  `price_id` int(11) NOT NULL,
+  `sub_locality_id` int(11) DEFAULT NULL,
+  `material_id` int(11) DEFAULT NULL,
+  `price` decimal(10,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sub_localities`
+--
+
+CREATE TABLE `sub_localities` (
+  `sub_locality_id` int(11) NOT NULL,
+  `sub_locality_name` varchar(100) NOT NULL,
+  `district_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -105,16 +103,28 @@ INSERT INTO `users` (`id`, `username`, `password`, `user_type`) VALUES
 -- Indexes for table `districts`
 --
 ALTER TABLE `districts`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `dis` (`dis`);
+  ADD PRIMARY KEY (`district_id`);
 
 --
--- Indexes for table `location`
+-- Indexes for table `materials`
 --
-ALTER TABLE `location`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `locations` (`locations`),
-  ADD KEY `fk_location_district` (`district_id`);
+ALTER TABLE `materials`
+  ADD PRIMARY KEY (`material_id`);
+
+--
+-- Indexes for table `material_prices`
+--
+ALTER TABLE `material_prices`
+  ADD PRIMARY KEY (`price_id`),
+  ADD KEY `sub_locality_id` (`sub_locality_id`),
+  ADD KEY `material_id` (`material_id`);
+
+--
+-- Indexes for table `sub_localities`
+--
+ALTER TABLE `sub_localities`
+  ADD PRIMARY KEY (`sub_locality_id`),
+  ADD KEY `district_id` (`district_id`);
 
 --
 -- Indexes for table `users`
@@ -130,13 +140,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `districts`
 --
 ALTER TABLE `districts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `district_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `location`
+-- AUTO_INCREMENT for table `materials`
 --
-ALTER TABLE `location`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+ALTER TABLE `materials`
+  MODIFY `material_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `material_prices`
+--
+ALTER TABLE `material_prices`
+  MODIFY `price_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `sub_localities`
+--
+ALTER TABLE `sub_localities`
+  MODIFY `sub_locality_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -149,10 +171,17 @@ ALTER TABLE `users`
 --
 
 --
--- Constraints for table `location`
+-- Constraints for table `material_prices`
 --
-ALTER TABLE `location`
-  ADD CONSTRAINT `fk_location_district` FOREIGN KEY (`district_id`) REFERENCES `districts` (`id`);
+ALTER TABLE `material_prices`
+  ADD CONSTRAINT `material_prices_ibfk_1` FOREIGN KEY (`sub_locality_id`) REFERENCES `sub_localities` (`sub_locality_id`),
+  ADD CONSTRAINT `material_prices_ibfk_2` FOREIGN KEY (`material_id`) REFERENCES `materials` (`material_id`);
+
+--
+-- Constraints for table `sub_localities`
+--
+ALTER TABLE `sub_localities`
+  ADD CONSTRAINT `sub_localities_ibfk_1` FOREIGN KEY (`district_id`) REFERENCES `districts` (`district_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
