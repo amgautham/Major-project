@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 05, 2025 at 04:39 PM
+-- Generation Time: Feb 05, 2025 at 06:42 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -50,6 +50,30 @@ CREATE TABLE `materials` (
   `material_name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `materials`
+--
+
+INSERT INTO `materials` (`material_id`, `material_name`) VALUES
+(1, 'Concrete'),
+(2, 'Wood'),
+(3, 'Steel'),
+(4, 'Brick'),
+(5, 'Glass'),
+(6, 'Drywall (Plasterboard)'),
+(7, 'Insulation'),
+(8, 'Tile'),
+(9, 'Stone'),
+(10, 'Roofing Shingles'),
+(11, 'PVC'),
+(12, 'Cement'),
+(13, 'Paint'),
+(14, 'Carpet'),
+(15, 'Masonry'),
+(16, 'Plywood'),
+(17, 'Rebar'),
+(18, 'Laminate');
+
 -- --------------------------------------------------------
 
 --
@@ -63,6 +87,14 @@ CREATE TABLE `material_prices` (
   `price` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `material_prices`
+--
+
+INSERT INTO `material_prices` (`price_id`, `sub_locality_id`, `material_id`, `price`) VALUES
+(2, 2, 1, 500.00),
+(3, 2, 4, 6.00);
+
 -- --------------------------------------------------------
 
 --
@@ -74,6 +106,15 @@ CREATE TABLE `sub_localities` (
   `sub_locality_name` varchar(100) NOT NULL,
   `district_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `sub_localities`
+--
+
+INSERT INTO `sub_localities` (`sub_locality_id`, `sub_locality_name`, `district_id`) VALUES
+(1, 'Mala', 1),
+(2, 'Kodungallur', 1),
+(3, 'Chalakudi', 1);
 
 -- --------------------------------------------------------
 
@@ -146,19 +187,19 @@ ALTER TABLE `districts`
 -- AUTO_INCREMENT for table `materials`
 --
 ALTER TABLE `materials`
-  MODIFY `material_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `material_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `material_prices`
 --
 ALTER TABLE `material_prices`
-  MODIFY `price_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `price_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `sub_localities`
 --
 ALTER TABLE `sub_localities`
-  MODIFY `sub_locality_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `sub_locality_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`

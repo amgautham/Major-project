@@ -46,10 +46,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
     // Insert Material Price
-    elseif (isset($_POST['material_price'])) {
+    elseif (isset($_POST['price'])) {
         $sub_locality_id = $_POST['sub_locality_id'];
         $material_id = $_POST['material_id'];
         $price = $_POST['price'];
+        //echo "<div class='message success'>$price.</div>";
         $sql = "INSERT INTO material_prices (sub_locality_id, material_id, price) VALUES ($sub_locality_id, $material_id, $price)";
         if ($conn->query($sql) === TRUE) {
             echo "<div class='message success'>Material price added successfully.</div>";
