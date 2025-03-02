@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Add or update price logic
         $stmt = $conn->prepare("INSERT INTO material_prices (sub_locality_id, material_id, price) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE price = ?");
-        $stmt->bind_param("iidi", $sub_locality_id, $material_id, $price, $price);
+        $stmt->bind_param($sub_locality_id, $material_id, $price, $price);
         $stmt->execute();
     }
 }
