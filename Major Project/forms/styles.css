@@ -1,101 +1,91 @@
 /* styles.css */
 body {
     font-family: Arial, sans-serif;
+    background-color: #fcf8e3; /* Light yellow background */
     margin: 0;
     padding: 0;
-    background-color: #fffde6;
-    color: #333;
+    display: flex;
+    justify-content: center;
 }
 
 .container {
-    width: 100%;
-    max-width: 600px;
-    margin: 50px auto;
-    text-align: center;
+    max-width: 800px;
+    background-color: #fffbee; /* Slightly off-white container */
     padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    background-color: #fffbe0;
-    border-radius: 8px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
 h1 {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: bold;
-    margin-bottom: 30px;
+    color: #333;
 }
 
 .calculator-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    align-items: center;
 }
 
 .form-group {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+    margin: 15px 0;
+    text-align: left;
+    width: 100%;
+    max-width: 500px;
 }
 
 label {
-    font-size: 14px;
     font-weight: bold;
-    color: #333;
+    font-size: 14px;
+    display: block;
+    color: #666;
+    margin-bottom: 5px;
 }
 
-select {
+select, input {
     width: 100%;
     padding: 10px;
-    font-size: 14px;
     border: 1px solid #ccc;
-    border-radius: 4px;
-    outline: none;
-    box-sizing: border-box;
+    border-radius: 5px;
+    font-size: 14px;
 }
 
 .area-input {
     display: flex;
     align-items: center;
-    gap: 15px;
 }
 
-#area {
-    width: 120px; /* Reduced width */
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    outline: none;
+.area-input input {
+    flex: 1;
 }
 
 .unit-options {
     display: flex;
+    align-items: center;
     gap: 10px;
+    margin-left: 10px;
 }
 
 .unit-options label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
     font-size: 14px;
-    color: #333;
-    cursor: pointer;
 }
 
-.unit-options input[type="radio"] {
-    margin-right: 5px;
-}
-
-.next-button {
-    padding: 10px 20px;
-    font-size: 16px;
+button.next-button {
+    background-color: #fdd835; /* Yellow button */
+    color: black;
     font-weight: bold;
-    color: #fff;
-    background-color: #ffd700;
+    padding: 10px 15px;
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
-    text-transform: uppercase;
-    transition: background-color 0.3s ease;
+    margin-top: 15px;
 }
 
-.next-button:hover {
-    background-color: #ffc107;
+button.next-button:hover {
+    background-color: #fbc02d;
 }

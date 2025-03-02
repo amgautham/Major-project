@@ -1,0 +1,95 @@
+
+
+.nigga { 
+    max-width: 5000px;
+    background-color: #fffbee; /* Slightly off-white container */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+
+    /* Centering */
+    margin: auto;
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    justify-content: center; /* Center content vertically */
+    align-items: center; /* Center content horizontally */
+    min-height: 100vh; /* Make it take full viewport height */
+}
+
+h1 {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+}
+
+.calculator-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.form-group {
+    margin: 15px 0;
+    text-align: left;
+    width: 100%;
+    max-width: 500px;
+}
+
+label {
+    font-weight: bold;
+    font-size: 14px;
+    display: block;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+select, input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+}
+
+.area-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.area-input input {
+    flex: 1;
+}
+
+.unit-options {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 10px;
+}
+
+.unit-options label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+}
+
+button.next-button {
+    background-color: #fdd835; /* Yellow button */
+    color: black;
+    font-weight: bold;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+}
+
+button.next-button:hover {
+    background-color: #fbc02d;
+}
