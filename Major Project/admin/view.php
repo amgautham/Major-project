@@ -1,29 +1,28 @@
 <?php
-// db.php - MySQL Connection
 $servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "house";  // Update with your database name
+$username = "root"; // Change if needed
+$password = ""; // Change if needed
+$database = "low_cost_housing"; // Your database name
 
 // Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($servername, $username, $password, $database);
 
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch records from all tables
-$districts_query = "SELECT * FROM districts";
-$sub_localities_query = "SELECT * FROM sub_localities";
-$materials_query = "SELECT * FROM materials";
-$prices_query = "SELECT * FROM material_prices";
+// Query to fetch table names, excluding 'user' table
+$sql = "SHOW TABLES";
+$result = $conn->query($sql);
 
-// Execute queries
-$districts_result = $conn->query($districts_query);
-$sub_localities_result = $conn->query($sub_localities_query);
-$materials_result = $conn->query($materials_query);
-$prices_result = $conn->query($prices_query);
+// Store all table names in an array
+$tables = [];
+while ($row = $result->fetch_array()) {
+    if ($row[0] !== 'user') { // Exclude 'user' table
+        $tables[] = $row[0];
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -31,140 +30,90 @@ $prices_result = $conn->query($prices_query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - View Tables</title>
+    <title>Database Tables</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 80%;
-            margin: auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            margin-top: 50px;
-        }
-        h1 {
+            background-color: #f8f9fa;
             text-align: center;
+            padding: 20px;
+        }
+        h2 {
             color: #333;
+            margin-top: 40px;
         }
         table {
-            width: 100%;
-            margin-bottom: 20px;
+            margin: auto;
             border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
+            width: 90%;
+            background: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 40px;
         }
         th, td {
-            padding: 10px;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
             text-align: left;
         }
         th {
-            background-color: #f4f4f9;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: #007bff;
+            color: white;
         }
         tr:hover {
             background-color: #f1f1f1;
+        }
+        p {
+            color: #777;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Admin Panel - View Tables</h1>
+    <h1>Database: <?php echo htmlspecialchars($database); ?></h1>
 
-    <h2>Districts</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>District Name</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php while ($row = $districts_result->fetch_assoc()) { ?>
-                <tr>
-                    <td><?php echo $row['district_id']; ?></td>
-                    <td><?php echo $row['district_name']; ?></td>
-                </tr>
-            <?php } ?>
-        </tbody>
-    </table>
+    <?php
+    if (empty($tables)) {
+        echo "<p>No tables found in the database.</p>";
+    } else {
+        foreach ($tables as $table) {
+            echo "<h2>Table: " . htmlspecialchars($table) . "</h2>";
 
-    <h2>Sub-localities</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Sub-locality Name</th>
-                <th>District ID</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php while ($row = $sub_localities_result->fetch_assoc()) { ?>
-                <tr>
-                    <td><?php echo $row['sub_locality_id']; ?></td>
-                    <td><?php echo $row['sub_locality_name']; ?></td>
-                    <td><?php echo $row['district_id']; ?></td>
-                </tr>
-            <?php } ?>
-        </tbody>
-    </table>
+            // Query to fetch all data from each table
+            $query = "SELECT * FROM `$table`";
+            $data_result = $conn->query($query);
 
-    <h2>Materials</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Material Name</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php while ($row = $materials_result->fetch_assoc()) { ?>
-                <tr>
-                    <td><?php echo $row['material_id']; ?></td>
-                    <td><?php echo $row['material_name']; ?></td>
-                </tr>
-            <?php } ?>
-        </tbody>
-    </table>
+            if ($data_result->num_rows > 0) {
+                echo "<table border='1'>";
+                
+                // Fetch column names
+                $fields = $data_result->fetch_fields();
+                echo "<tr>";
+                foreach ($fields as $field) {
+                    echo "<th>" . htmlspecialchars($field->name) . "</th>";
+                }
+                echo "</tr>";
 
-    <h2>Material Prices</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Sub-locality ID</th>
-                <th>Material ID</th>
-                <th>Price</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php while ($row = $prices_result->fetch_assoc()) { ?>
-                <tr>
-                    <td><?php echo $row['price_id']; ?></td>
-                    <td><?php echo $row['sub_locality_id']; ?></td>
-                    <td><?php echo $row['material_id']; ?></td>
-                    <td><?php echo $row['price']; ?></td>
-                </tr>
-            <?php } ?>
-        </tbody>
-    </table>
+                // Fetch and display table data
+                while ($row = $data_result->fetch_assoc()) {
+                    echo "<tr>";
+                    foreach ($row as $cell) {
+                        echo "<td>" . htmlspecialchars($cell) . "</td>";
+                    }
+                    echo "</tr>";
+                }
+                
+                echo "</table>";
+            } else {
+                echo "<p>No data found in this table.</p>";
+            }
+        }
+    }
 
-</div>
+    $conn->close();
+    ?>
 
 </body>
 </html>
-
-<?php
-// Close connection
-$conn->close();
-?>

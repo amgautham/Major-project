@@ -150,7 +150,7 @@ if (!isset($_SESSION['username'])) {
   <div class="container">
     <div class="section-title">
       <h2>Estimator</h2>
-    </div>
+    <!--</div>
     <div class="row">
       <div class="col-md-4">
         <div class="service-media"> <img src="img/services/service-1.jpg" alt=" "> </div>
@@ -194,7 +194,7 @@ if (!isset($_SESSION['username'])) {
         <div class="service-desc">
           <h3>Decks & Porches</h3>
           <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed dapibus leo nec ornare diam sedasd commodo nibh ante facilisis bibendum dolor feugiat at.</p>
-        </div>
+        </div>!-->
       </div>
     </div>
   </div>
