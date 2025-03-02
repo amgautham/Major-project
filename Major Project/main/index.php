@@ -14,6 +14,9 @@ if (!isset($_SESSION['username'])) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BuildWise</title>
+
+
+
 <meta name="description" content="">
 <meta name="author" content="">
 
@@ -150,6 +153,39 @@ if (!isset($_SESSION['username'])) {
   <div class="container">
     <div class="section-title">
       <h2>Estimator</h2>
+      <div class="home-cost-calculator">
+    <h1>Home Construction Cost Calculator - Total Cost and <br> 
+        <strong>Phase-wise breakdown of the Home Building Project</strong>
+    </h1>
+
+    <div class="calculator-form-group">
+        <label for="home-state">Select State</label>
+        <select id="home-state">
+            <option>Select State</option>
+        </select>
+    </div>
+
+    <div class="calculator-form-group">
+        <label for="home-city">Select City</label>
+        <select id="home-city">
+            <option>Select City</option>
+        </select>
+    </div>
+
+    <div class="calculator-form-group">
+        <label for="home-area">Area</label>
+        <input type="text" id="home-area" placeholder="5000">
+    </div>
+
+    <div class="calculator-radio-group">
+        <input type="radio" id="home-sq-feet" name="home-unit" checked>
+        <label for="home-sq-feet">Sq. Feet</label>
+
+        <input type="radio" id="home-sq-meter" name="home-unit">
+        <label for="home-sq-meter">Sq. Meter</label>
+    </div>
+</div>
+
     <!--</div>
     <div class="row">
       <div class="col-md-4">
