@@ -154,9 +154,9 @@ if (!isset($_SESSION['username'])) {
   </div>
   </div>
   <!-- Services Section -->
-  <div class="nigga" id="services">
+  <div class="nigga" id="services" >
     <h1>Find Out How Much Your Home-building Project Will Cost</h1>
-    <form class="calculator-form">
+    <form class="calculator-form" action="server.php" method="post">
 
       <div class="form-group">
         <label for="district">Select District</label>
@@ -197,7 +197,7 @@ if (!isset($_SESSION['username'])) {
           <option value="4bhk">4 BHK</option>
         </select>
       </div>
-      <button type="submit" class="next-button" onclick="goToGraph()">Estimate Cost ➝</button>
+      <button type="submit" class="next-button" >Estimate Cost ➝</button>
     </form>
   </div>
 
