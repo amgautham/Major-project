@@ -1,74 +1,67 @@
 <?php
-$conn = new mysqli("localhost", "root", "", "low_cost_housing");
+// Database connection
+$host = "localhost";  // Change if needed
+$user = "root";       // Change if needed
+$pass = "";           // Change if needed
+$dbname = "low_cost_housing"; // Change to your DB name
 
+$conn = new mysqli($host, $user, $pass, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch all materials and their details
-$query = "SELECT * FROM material_prices";  // Adjust the table name if needed
-$result = $conn->query($query);
-$materials = [];
+// Fetch materials and prices for a specific sub-locality
+$sub_locality_id = 2; // Change as needed
+$sql = "SELECT m.material_name, mp.price 
+        FROM materials m
+        JOIN material_prices mp ON m.material_id = mp.material_id
+        WHERE mp.sub_locality_id = $sub_locality_id";
 
-while ($row = $result->fetch_assoc()) {
-    $materials[$row['resource']][] = $row;
-}
-
-$conn->close();
+$result = $conn->query($sql);
 ?>
 
-<div class="cost-table">
-    <h2>Cost by Resource Allocation</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Resource</th>
-                <th>Quantity</th>
-                <th>Quality</th>
-                <th>Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($materials as $resource => $qualities): ?>
-                <tr>
-                    <td><?php echo $resource; ?></td>
-                    <td><?php echo $qualities[0]['quantity']; ?></td> 
-                    <td>
-                        <?php foreach ($qualities as $quality): ?>
-                            <input type="radio" name="<?php echo strtolower($resource); ?>" 
-                                value="<?php echo $quality['quality']; ?>" 
-                                onchange="updatePrice('<?php echo $resource; ?>', this.value)" 
-                                <?php echo ($quality['is_default'] == 1) ? 'checked' : ''; ?>>
-                            <?php echo $quality['quality']; ?>
-                        <?php endforeach; ?>
-                    </td>
-                    <td id="<?php echo strtolower($resource); ?>-price">
-                        ₹<?php echo $qualities[0]['price']; ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="3"><strong>Total Amount</strong></td>
-                <td id="total-amount">₹0</td>
-            </tr>
-        </tfoot>
-    </table>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Material Cost Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #4CAF50; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
 
-<script>
-function updatePrice(resource, quality) {
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "update_price.php", true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            let response = JSON.parse(xhr.responseText);
-            document.getElementById(resource.toLowerCase() + "-price").innerHTML = "₹" + response.new_price;
-            document.getElementById("total-amount").innerHTML = "₹" + response.total_price;
+<h2>Material Cost Calculation</h2>
+<table>
+    <tr>
+        <th>Material</th>
+        <th>Quantity</th>
+        <th>Total Price</th>
+    </tr>
+
+    <?php
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $quantity = rand(1, 100); // Dummy quantity (1-100)
+            $total_price = $quantity * $row["price"];
+            echo "<tr>
+                    <td>{$row['material_name']}</td>
+                    <td>$quantity</td>
+                    <td>₹" . number_format($total_price, 2) . "</td>
+                  </tr>";
         }
-    };
-    xhr.send("resource=" + resource + "&quality=" + quality);
-}
-</script>
+    } else {
+        echo "<tr><td colspan='3'>No data available</td></tr>";
+    }
+    $conn->close();
+    ?>
+
+</table>
+
+</body>
+</html>
