@@ -89,5 +89,68 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <td>" . number_format($total_cost, 2) . "</td>
             </tr>
         </table>";
+        $cost_breakdown = [
+            "Home Design & Approval" => 0.03 * $total_cost,
+            "Excavation" => 0.05 * $total_cost,
+            "Footing & Foundation" => 0.12 * $total_cost,
+            "RCC Work - Columns & Slabs" => 0.20 * $total_cost,
+            "Roof Slab" => 0.10 * $total_cost,
+            "Brickwork and Plastering" => 0.18 * $total_cost,
+            "Flooring & Tiling" => 0.10 * $total_cost,
+            "Electric Wiring" => 0.07 * $total_cost,
+            "Water Supply & Plumbing" => 0.10 * $total_cost,
+            "Door" => 0.05 * $total_cost
+        ];
+    
+        // Convert PHP array to JSON for JavaScript
+        $cost_values_json = json_encode(array_values($cost_breakdown));
+    
+        echo "<h2>Cost Breakdown for " . number_format($area, 2) . " sqft</h2>";
+        echo "<table border='1' style='border-collapse: collapse; width: 50%; text-align: center;'>
+                <tr><th>Category</th><th>Cost (Rs.)</th></tr>";
+    
+        foreach ($cost_breakdown as $category => $cost) {
+            echo "<tr><td>$category</td><td>" . number_format($cost, 2) . "</td></tr>";
+        }
+    
+        echo "<tr style='font-weight: bold;'><td>Total Cost</td><td>" . number_format($total_cost, 2) . "</td></tr>";
+        echo "</table>";
+    
+        // Pass cost values to JavaScript
+        echo "<script> var costValues = $cost_values_json; </script>";
+    }
+    ?>
+    
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chart Container -->
+    <canvas id="costChart" width="400" height="200"></canvas>
+    
+    <!-- JavaScript for Rendering Doughnut Chart -->
+    <script>
+        var ctx = document.getElementById('costChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Home Design & Approval', 'Excavation', 'Footing & Foundation', 'RCC Work - Columns & Slabs', 'Roof Slab', 'Brickwork and Plastering', 'Flooring & Tiling', 'Electric Wiring', 'Water Supply & Plumbing', 'Door'],
+                datasets: [{
+                    data: costValues,
+                    backgroundColor: ['yellow', 'green', 'black', 'blue', 'red', 'pink', 'purple', 'orange', 'gray', 'brown'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+    </script>
+    
 }
 ?>
+  
