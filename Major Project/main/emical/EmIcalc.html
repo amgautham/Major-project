@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMI Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: #333;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 900px;
+            margin: auto;
+            text-align: left;
+        }
+        .chart-container {
+            width: 40%;
+            margin: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #333;
+            color: white;
+        }
+        input[type=range] {
+            width: 100%;
+        }
+        .result {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        button {
+            background-color: yellow;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>EMI Calculator</h2>
+        <label>Home Loan Amount (₹ in Lakhs):</label>
+        <input type="range" id="loanAmount" min="0" max="100" step="1" value="24" oninput="updateValues()">
+        <span id="loanAmountValue">₹24,00,000</span><br><br>
+
+        <label>Interest Rate (%):</label>
+        <input type="range" id="interestRate" min="5" max="20" step="0.1" value="10" oninput="updateValues()">
+        <span id="interestRateValue">10%</span><br><br>
+
+        <label>Loan Tenure (Years):</label>
+        <input type="range" id="tenure" min="5" max="30" step="1" value="10" oninput="updateValues()">
+        <span id="tenureValue">10 years</span><br><br>
+
+        <div class="result">Loan EMI: ₹<span id="emi">0</span></div>
+
+        <h3>Total Interest Payable</h3>
+        <p>₹<span id="totalInterest">0</span></p>
+
+        <h3>Total Payment (Principal + Interest)</h3>
+        <p>₹<span id="totalPayment">0</span></p>
+
+        <div class="chart-container">
+            <canvas id="emiChart"></canvas>
+        </div>
+    </div>
+
+    <h2>EMI Payment Schedule</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Year</th>
+                <th>Principal Paid</th>
+                <th>Interest Paid</th>
+                <th>Total Payment</th>
+                <th>Balance</th>
+                <th>Loan Paid %</th>
+            </tr>
+        </thead>
+        <tbody id="emiTableBody"></tbody>
+    </table>
+
+    <div class="buttons">
+        <button onclick="window.print()">PRINT</button>
+        <button>SHARE</button>
+    </div>
+
+    <script>
+        var chart;
+        function updateValues() {
+            let loan = document.getElementById('loanAmount').value * 100000;
+            let rate = document.getElementById('interestRate').value / 100 / 12;
+            let tenure = document.getElementById('tenure').value * 12;
+            let emi = (loan * rate * Math.pow(1 + rate, tenure)) / (Math.pow(1 + rate, tenure) - 1);
+
+            let totalInterest = (emi * tenure) - loan;
+            let totalPayment = loan + totalInterest;
+
+            document.getElementById('loanAmountValue').textContent = `₹${loan.toLocaleString()}`;
+            document.getElementById('interestRateValue').textContent = `${document.getElementById('interestRate').value}%`;
+            document.getElementById('tenureValue').textContent = `${document.getElementById('tenure').value} years`;
+            document.getElementById('emi').textContent = emi.toFixed(2);
+            document.getElementById('totalInterest').textContent = totalInterest.toFixed(2);
+            document.getElementById('totalPayment').textContent = totalPayment.toFixed(2);
+
+            updateChart(loan, totalInterest);
+            updateTable(loan, rate, tenure, emi);
+        }
+
+        function updateChart(principal, interest) {
+            let ctx = document.getElementById('emiChart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Principal Loan Amount', 'Total Interest'],
+                    datasets: [{
+                        data: [principal, interest],
+                        backgroundColor: ['#f39c12', '#2980b9']
+                    }]
+                }
+            });
+        }
+
+        function updateTable(loan, rate, tenure, emi) {
+            let tbody = document.getElementById('emiTableBody');
+            tbody.innerHTML = '';
+            let balance = loan;
+            let totalPaid = 0;
+            let yearlyEmi = emi * 12;
+
+            for (let year = 1; year <= tenure / 12; year++) {
+                let interestPaid = balance * rate * 12;
+                let principalPaid = yearlyEmi - interestPaid;
+                balance -= principalPaid;
+                totalPaid += principalPaid;
+
+                let row = `<tr>
+                    <td>${new Date().getFullYear() + year}</td>
+                    <td>₹${principalPaid.toFixed(2)}</td>
+                    <td>₹${interestPaid.toFixed(2)}</td>
+                    <td>₹${yearlyEmi.toFixed(2)}</td>
+                    <td>₹${balance.toFixed(2)}</td>
+                    <td>${((totalPaid / loan) * 100).toFixed(2)}%</td>
+                </tr>`;
+                tbody.innerHTML += row;
+
+                if (balance <= 0) break;
+            }
+        }
+
+        updateValues();
+    </script>
+</body>
+</html>
