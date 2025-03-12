@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($admin === 'admin') {
                     header("Location: /Majorpro/admin/menu.php");
                 } else {
-                    header("Location: /Major-project/Major Project/main/index.php");
+                    header("Location: /Major-project/main/index.php");
                 }
                 exit;
             } else {

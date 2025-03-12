@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="../main/css/my.css">
+</head>
+<body>
+    
+    <div class="nigga" id="services" >
+        <h1>Find Out How Much Your Home-building Project Will Cost</h1>
+        <form class="calculator-form" action="server.php" method="post">
+    
+          <div class="form-group">
+            <label for="district">Select District</label>
+            <select id="district" name="district">
+              <option value="">Select District</option>
+                <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+                <option value="Kollam">Kollam</option>
+                <option value="Pathanamthitta">Pathanamthitta</option>
+                <option value="Alappuzha">Alappuzha</option>
+                <option value="Kottayam">Kottayam</option>
+                <option value="Idukki">Idukki</option>
+                <option value="Ernakulam">Ernakulam</option>
+                <option value="Thrissur">Thrissur</option>
+                <option value="Palakkad">Palakkad</option>
+                <option value="Malappuram">Malappuram</option>
+                <option value="Kozhikode">Kozhikode</option>
+                <option value="Wayanad">Wayanad</option>
+                <option value="Kannur">Kannur</option>
+                <option value="Kasaragod">Kasaragod</option>
+            </select>
+          </div>
+          <!--<div class="form-group">
+            <label for="location">Select Location</label>
+            <select id="location" name="location">
+              <option value="">Select Location</option>
+              <!-- Locations will populate dynamically based on district ID 
+            </select>
+          </div>!-->
+    
+    
+          <div class="form-group">
+            <label for="area">Area</label>
+            <div class="area-input">
+              <input type="number" id="area" name="area" placeholder="5000">
+              <div class="unit-options">
+                <label>
+                  <input type="radio" name="unit" value="sqft" checked> Sq. Feet
+                </label>
+                <label>
+                  <input type="radio" name="unit" value="sqm"> Sq. Meter
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="residential">Residential Building</label>
+            <select id="residential" name="residential">
+              <option value="1bhk">1 BHK</option>
+              <option value="2bhk">2 BHK</option>
+              <option value="3bhk">3 BHK</option>
+              <option value="4bhk">4 BHK</option>
+            </select>
+          </div>
+          <button type="submit" class="next-button" id="est" >Estimate Cost ➝</button>
+        </form>
+      </div>
+</body>
+</html>

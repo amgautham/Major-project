@@ -4,7 +4,7 @@ session_start();
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
   // Redirect to the login page
-  header("Location: /Major-project/Major Project/login/login.php");
+  header("Location: /Major-project/login/login.php");
   exit();
 }
 ?>
@@ -101,7 +101,7 @@ if (!isset($_SESSION['username'])) {
           <p>Take the first step toward your budget-friendly dream home today!
           </p>
         </div>
-        <div class="col-xs-12 col-md-4 text-center"><a href="#services" class="btn btn-custom btn-lg page-scroll">Free Estimate</a></div>
+        <div class="col-xs-12 col-md-4 text-center"><a href="../estimator/hi.html" class="btn btn-custom btn-lg page-scroll">Free Estimate</a></div>
       </div>
     </div>
   </div>
@@ -156,22 +156,35 @@ if (!isset($_SESSION['username'])) {
   <!-- Services Section -->
   <div class="nigga" id="services" >
     <h1>Find Out How Much Your Home-building Project Will Cost</h1>
-    <form class="calculator-form" action="server.php" method="post">
+    <form class="calculator-form" action="../calc/server.php" method="post">
 
       <div class="form-group">
         <label for="district">Select District</label>
-        <select id="district" name="district" onchange="fetchLocations()">
+        <select id="district" name="district">
           <option value="">Select District</option>
-          <!-- Districts will populate dynamically with IDs as values -->
+            <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+            <option value="Kollam">Kollam</option>
+            <option value="Pathanamthitta">Pathanamthitta</option>
+            <option value="Alappuzha">Alappuzha</option>
+            <option value="Kottayam">Kottayam</option>
+            <option value="Idukki">Idukki</option>
+            <option value="Ernakulam">Ernakulam</option>
+            <option value="Thrissur">Thrissur</option>
+            <option value="Palakkad">Palakkad</option>
+            <option value="Malappuram">Malappuram</option>
+            <option value="Kozhikode">Kozhikode</option>
+            <option value="Wayanad">Wayanad</option>
+            <option value="Kannur">Kannur</option>
+            <option value="Kasaragod">Kasaragod</option>
         </select>
       </div>
-      <div class="form-group">
+      <!--<div class="form-group">
         <label for="location">Select Location</label>
         <select id="location" name="location">
           <option value="">Select Location</option>
-          <!-- Locations will populate dynamically based on district ID -->
+          <!-- Locations will populate dynamically based on district ID 
         </select>
-      </div>
+      </div>!-->
 
 
       <div class="form-group">
@@ -197,7 +210,7 @@ if (!isset($_SESSION['username'])) {
           <option value="4bhk">4 BHK</option>
         </select>
       </div>
-      <button type="submit" class="next-button" >Estimate Cost ➝</button>
+      <button type="submit" class="next-button" id="est" ><a href="../calc/server.php">Estimate Cost ➝</a></button>
     </form>
   </div>
 
