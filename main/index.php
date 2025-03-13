@@ -153,8 +153,48 @@ if (!isset($_SESSION['username'])) {
     </div>
   </div>
   </div>
+
+
+
+
+
+
+
+
+
+  <div id="about">
+    <div class="container">
+      <div class="row">
+        <!--<div class="col-xs-12 col-md-6"> <img src="img/about.jpg" class="img-responsive" alt=""> </div>!-->
+        <!--<div class="col-xs-12 col-md-6">!-->
+        <div class="about-text">
+          <h2>Abouut Estimator</h2>
+          <p>
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Explicabo libero maxime temporibus corrupti! Minus maxime exercitationem omnis inventore sit, repudiandae qui architecto. Vero nulla magnam mollitia consectetur molestiae expedita voluptate?
+        </p>
+        <div class="col-xs-12 col-md-4 text-center"><a href="../estimator/hi.html" class="btn btn-custom btn-lg page-scroll">Free Estimate</a></div>
+
+          <!--<h3>Why Choose Us?</h3>
+          <div class="list-style">
+            <div class="col-lg-6 col-sm-6 col-xs-12">
+              <p></p>
+            </div>
+            <div class="col-lg-6 col-sm-6 col-xs-12">
+              <ul>
+                <li>Free Consultation</li>
+                <li>Satisfied Customers</li>
+                <li>Project Management</li>
+                <li>Affordable Pricing</li>
+              </ul>
+            </div>
+          </div>!-->
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
   <!-- Services Section -->
-  <div class="nigga" id="services" >
+  <!--<div class="nigga" id="services" >
     <h1>Find Out How Much Your Home-building Project Will Cost</h1>
     <form class="calculator-form" action="../calc/server.php" method="post">
 
@@ -184,7 +224,7 @@ if (!isset($_SESSION['username'])) {
           <option value="">Select Location</option>
           <!-- Locations will populate dynamically based on district ID 
         </select>
-      </div>!-->
+      </div>
 
 
       <div class="form-group">
@@ -212,7 +252,7 @@ if (!isset($_SESSION['username'])) {
       </div>
       <button type="submit" class="next-button" id="est" ><a href="../calc/server.php">Estimate Cost ➝</a></button>
     </form>
-  </div>
+  </div>!-->
 
   <!--</div>
     <div class="row">
