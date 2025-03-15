@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($insert_stmt->execute()) {
       $_SESSION['username'] = $username;
       $_SESSION['user_type'] = $user_type;
-      header("Location: /Major-project/Major Project/main/index.php");
+      header("Location: /Major-project/main/index.php");
       exit; // Redirect after successful registration
     } else {
       $a5 = "Error registering user!";
