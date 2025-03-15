@@ -232,6 +232,7 @@ $districts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <body>
     <div class="navbar">
+        <a href="../admin/menu.php" class="logout-link">MENU</a>
         <h2>Districts Management</h2>
         <a href="../login/logout.php" class="logout-link">Logout</a>
     </div>

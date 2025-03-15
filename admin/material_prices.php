@@ -129,6 +129,7 @@ $prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
     <div class="navbar">
+        <a href="../admin/menu.php" class="logout-link">MENU</a>
         <h2>Material Prices Management</h2>
         <a href="../login/logout.php" class="logout-link">Logout</a>
     </div>
