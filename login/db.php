@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root";
 $password = ""; 
-$dbname = "low_cost_housing";
+$dbname = "buildwise";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
