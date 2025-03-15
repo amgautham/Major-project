@@ -67,7 +67,7 @@ if (!isset($_SESSION['username'])) {
         <ul class="nav navbar-nav navbar-right">
           <li><a href="#about" class="page-scroll">Introduction</a></li>
           <li><a href="#services" class="page-scroll">Estimator</a></li>
-          <li><a href="#portfolio" class="page-scroll">EMI Calculator</a></li>
+          <li><a href="#portfolio" class="page-scroll">Contact dealers</a></li>
           <li><a href="#testimonials" class="page-scroll">Models</a></li>
           <li><a href="#contact" class="page-scroll">Contact us</a></li>
           <!--<li><a href="../login/logout.php" class="page-scroll">Logout</a></li>-->
@@ -162,7 +162,7 @@ if (!isset($_SESSION['username'])) {
 
 
 
-  <div id="about">
+  <div id="services">
     <div class="container">
       <div class="row">
         <!--<div class="col-xs-12 col-md-6"> <img src="img/about.jpg" class="img-responsive" alt=""> </div>!-->
@@ -307,7 +307,7 @@ if (!isset($_SESSION['username'])) {
   <div id="portfolio">
     <div class="container">
       <div class="section-title">
-        <h2>EMI Calculator</h2>
+        <h2>Contact dealers</h2>
       </div>
       <div class="row">
         <div class="portfolio-items">
@@ -409,7 +409,7 @@ if (!isset($_SESSION['username'])) {
   <div id="testimonials">
     <div class="container">
       <div class="section-title">
-        <h2>Testimonials</h2>
+        <h2>>???</h2>
       </div>
       <div class="row">
         <div class="col-md-4">
