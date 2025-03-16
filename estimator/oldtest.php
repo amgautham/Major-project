@@ -71,10 +71,10 @@ function getCategoryQuantity($category, $houseArea) {
     <style>
         .container {
             max-width: 5000px;
-            background-color: #ffffff; /* White background */
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* Softer shadow */
+            background-color: #fffbee;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
             margin: auto;
             display: flex;
@@ -85,17 +85,14 @@ function getCategoryQuantity($category, $houseArea) {
         }
 
         h1 {
-            font-size: 28px;
-            font-weight: 700;
-            color: #1E3A8A; /* Dark blue for headings */
-            margin-bottom: 20px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
         }
 
         h3 {
-            color: #1E3A8A; /* Dark blue */
-            margin: 25px 0;
-            font-size: 20px;
-            font-weight: 600;
+            color: #444;
+            margin: 20px 0;
         }
 
         .calculator-form {
@@ -116,42 +113,34 @@ function getCategoryQuantity($category, $houseArea) {
             font-weight: bold;
             font-size: 14px;
             display: block;
-            color: #1E3A8A; /* Dark blue for labels */
-            margin-bottom: 8px;
+            color: #666;
+            margin-bottom: 5px;
         }
 
         select,
-        input[type="number"] {
+        input {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #A3CFFA; /* Light blue border */
-            border-radius: 6px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
             font-size: 14px;
             outline: none;
-            background-color: #f9faff; /* Very light blue background for inputs */
-            transition: border-color 0.3s ease;
-        }
-
-        select:focus,
-        input[type="number"]:focus {
-            border-color: #4A90E2; /* Medium blue on focus */
         }
 
         button.next-button, input[type="submit"] {
-            background-color: #E53E3E; /* Red button */
-            color: #ffffff; /* White text */
+            background-color: #fdd835;
+            color: black;
             font-weight: bold;
-            padding: 12px 20px;
+            padding: 10px 15px;
             border: none;
-            border-radius: 6px;
+            border-radius: 5px;
             cursor: pointer;
             margin-top: 15px;
-            margin-right: 10px;
             transition: background-color 0.3s ease;
         }
 
         button.next-button:hover, input[type="submit"]:hover {
-            background-color: #C53030; /* Darker red on hover */
+            background-color: #fbc02d;
         }
 
         table {
@@ -159,7 +148,7 @@ function getCategoryQuantity($category, $houseArea) {
             max-width: 900px;
             border-collapse: collapse;
             margin: 20px 0;
-            background-color: #ffffff; /* White table background */
+            background-color: #fff;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -173,40 +162,29 @@ function getCategoryQuantity($category, $houseArea) {
         }
 
         th {
-            background-color: #4A90E2; /* Medium blue header */
-            color: #ffffff; /* White text */
+            background-color: #fdd835;
+            color: #333;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         tr {
-            border-bottom: 1px solid #A3CFFA; /* Light blue border */
+            border-bottom: 1px solid #eee;
             transition: background-color 0.3s ease;
         }
 
         tr:hover {
-            background-color: #E6F0FA; /* Very light blue on hover */
+            background-color: #f9f9f9;
         }
 
         td {
-            color: #1E3A8A; /* Dark blue text */
+            color: #555;
         }
 
         .row-cost {
             font-weight: bold;
-            color: #1E3A8A; /* Dark blue */
-        }
-
-        a {
-            color: #4A90E2; /* Medium blue for links */
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        a:hover {
-            color: #1E3A8A; /* Darker blue on hover */
+            color: #2c3e50;
         }
 
         @media (max-width: 600px) {
@@ -224,7 +202,7 @@ function getCategoryQuantity($category, $houseArea) {
 
             tr {
                 margin-bottom: 15px;
-                border: 1px solid #A3CFFA; /* Light blue border */
+                border: 1px solid #ddd;
                 border-radius: 5px;
             }
         }
@@ -266,8 +244,8 @@ function getCategoryQuantity($category, $houseArea) {
         // For cost breakdown
         $breakdown = array();
 
-        // Check if materials are to be loaded, best preference selected, or estimation calculated
-        if (isset($_POST['load_materials']) || isset($_POST['best_preference']) || isset($_POST['calculate_estimation'])) {
+        // If user clicked "Load Materials" or "Calculate Estimation"
+        if (isset($_POST['load_materials']) || isset($_POST['calculate_estimation'])) {
             $district_id = intval($_POST['district_id']);
             $bhk = intval($_POST['bhk']);
             $area = floatval($_POST['area']);
@@ -283,12 +261,7 @@ function getCategoryQuantity($category, $houseArea) {
             
             if ($result && $result->num_rows > 0) {
                 echo "<table>";
-                echo "<tr>
-                        <th>Material (Category)</th>
-                        <th>Type</th>
-                        <th>Quantity</th>
-                        <th>Cost (₹)</th>
-                      </tr>";
+                echo "<tr><th>Material (Category)</th><th>Type</th><th>Quantity</th><th>Cost (₹)</th></tr>";
 
                 // Define material images
                 $material_images = [
@@ -315,67 +288,32 @@ function getCategoryQuantity($category, $houseArea) {
                     $material_id = $row['material_id'];
                     $material_name = $row['material_name'];
 
-                    // 1. Get available types & prices for this material
-                    // If best_preference button is clicked, order by priority (lower is better)
-                    if (isset($_POST['best_preference'])) {
-                        $types_query = "SELECT material_type, price, priority 
-                                        FROM material_prices 
-                                        WHERE district_id = $district_id 
-                                          AND material_id = $material_id 
-                                        ORDER BY priority ASC";
-                    } else {
-                        $types_query = "SELECT material_type, price 
-                                        FROM material_prices 
-                                        WHERE district_id = $district_id 
-                                          AND material_id = $material_id";
-                    }
+                    // Get available types & prices for this material
+                    $types_query = "SELECT material_type, price 
+                                    FROM material_prices 
+                                    WHERE district_id = $district_id 
+                                      AND material_id = $material_id";
                     $types_result = $conn->query($types_query);
 
                     $options = "<option value=''>Select Type</option>";
-                    
-                    // For Best Preference, mark only the first option (lowest priority) as selected
-                    $first_option = true;
                     while ($type = $types_result->fetch_assoc()) {
                         $selected_value = "";
-                        if (isset($_POST['best_preference']) && $first_option) {
+                        if (isset($_POST['selected_type'][$material_id]) && 
+                            $_POST['selected_type'][$material_id] == $type['price']) {
                             $selected_value = "selected";
-                            $first_option = false;
-                        } else {
-                            if (isset($_POST['selected_type'][$material_id]) && 
-                                $_POST['selected_type'][$material_id] == $type['price']) {
-                                $selected_value = "selected";
-                            }
                         }
                         $options .= "<option value='{$type['price']}' $selected_value>{$type['material_type']}</option>";
                     }
 
-                    // 2. Determine user-selected price
-                    if (isset($_POST['best_preference']) && empty($_POST['selected_type'][$material_id])) {
-                        // Re-run the query to get the best option price
-                        $best_query = "SELECT price FROM material_prices 
-                                       WHERE district_id = $district_id 
-                                         AND material_id = $material_id 
-                                       ORDER BY priority ASC LIMIT 1";
-                        $best_result = $conn->query($best_query);
-                        if ($best_result && $best_row = $best_result->fetch_assoc()) {
-                            $selected_price = floatval($best_row['price']);
-                        } else {
-                            $selected_price = 0;
-                        }
-                    } else {
-                        $selected_price = isset($_POST['selected_type'][$material_id])
-                            ? floatval($_POST['selected_type'][$material_id])
-                            : 0;
-                    }
+                    // Determine user-selected price
+                    $selected_price = isset($_POST['selected_type'][$material_id])
+                        ? floatval($_POST['selected_type'][$material_id])
+                        : 0;
 
-                    // 3. Get quantity: use user input if available, otherwise calculate from formula
-                    if (isset($_POST['quantity'][$material_id]) && $_POST['quantity'][$material_id] !== '') {
-                        $quantity = floatval($_POST['quantity'][$material_id]);
-                    } else {
-                        $quantity = getCategoryQuantity($material_name, $area);
-                    }
+                    // Calculate quantity from category formula
+                    $quantity = getCategoryQuantity($material_name, $area);
 
-                    // 4. Final cost = quantity × price × BHK
+                    // Final cost = quantity × price × BHK
                     $cost = $quantity * $selected_price * $bhk;
 
                     // Save for chart
@@ -398,9 +336,7 @@ function getCategoryQuantity($category, $houseArea) {
                                     $options
                                 </select>
                             </td>
-                            <td>
-                                <input type='number' step='any' name='quantity[$material_id]' value='{$quantity}' style='width: 100px;' />
-                            </td>
+                            <td>$quantity</td>
                             <td class='row-cost'>" . number_format($cost, 2) . "</td>
                           </tr>";
                 }
@@ -412,7 +348,10 @@ function getCategoryQuantity($category, $houseArea) {
 
         // If "Calculate Estimation" pressed, sum total cost & display chart
         if (isset($_POST['calculate_estimation'])) {
+            $bhk = intval($_POST['bhk']);
+            $area = floatval($_POST['area']);
             $total = 0;
+
             foreach ($breakdown as $item) {
                 $total += $item['cost'];
             }
@@ -431,20 +370,19 @@ function getCategoryQuantity($category, $houseArea) {
         ?>
 
         <?php
-        // Display buttons
-        if (!isset($_POST['load_materials']) && !isset($_POST['best_preference']) && !isset($_POST['calculate_estimation'])) {
-            echo "<input type='submit' name='load_materials' value='Load Materials'> ";
-            echo "<input type='submit' name='best_preference' value='Best Preference'>";
-        } else {
+        // Display correct button
+        if (isset($_POST['load_materials']) || isset($_POST['calculate_estimation'])) {
             echo "<input type='submit' name='calculate_estimation' value='Calculate Estimation'>";
+        } else {
+            echo "<input type='submit' name='load_materials' value='Load Materials'>";
         }
         ?>
     </form>
     <br>
     <a href="../main/emical/EmIcalc.html">EMI Calc Here</a>
-
+        
     <?php if (isset($_POST['calculate_estimation']) && !empty($labels)): ?>
-        <h3>Cost Breakdown by Category</h3>
+        <h3>Cost Breakdown by Category (%)</h3>
         <div style="max-width: 800px; margin: 20px auto; width: 100%;">
             <canvas id="costBreakdownChart" width="800" height="400"></canvas>
         </div>
@@ -452,6 +390,10 @@ function getCategoryQuantity($category, $houseArea) {
         <script>
             var labels = <?php echo json_encode($labels); ?>;
             var costValues = <?php echo json_encode($costValues); ?>;
+
+            // Calculate total for percentage
+            var totalCost = costValues.reduce((a, b) => a + b, 0);
+            var percentages = costValues.map(cost => ((cost / totalCost) * 100).toFixed(2));
 
             const ctx = document.getElementById('costBreakdownChart').getContext('2d');
             if (window.costChart) {
@@ -462,7 +404,7 @@ function getCategoryQuantity($category, $houseArea) {
                 data: {
                     labels: labels,
                     datasets: [{
-                        data: costValues,
+                        data: percentages,
                         backgroundColor: [
                             '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
                             '#9966FF', '#FF9F40', '#C9CBCF', '#8BC34A',

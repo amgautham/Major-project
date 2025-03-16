@@ -71,10 +71,10 @@ function getCategoryQuantity($category, $houseArea) {
     <style>
         .container {
             max-width: 5000px;
-            background-color: #ffffff; /* White background */
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* Softer shadow */
+            background-color: #fffbee;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
             margin: auto;
             display: flex;
@@ -85,17 +85,14 @@ function getCategoryQuantity($category, $houseArea) {
         }
 
         h1 {
-            font-size: 28px;
-            font-weight: 700;
-            color: #1E3A8A; /* Dark blue for headings */
-            margin-bottom: 20px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
         }
 
         h3 {
-            color: #1E3A8A; /* Dark blue */
-            margin: 25px 0;
-            font-size: 20px;
-            font-weight: 600;
+            color: #444;
+            margin: 20px 0;
         }
 
         .calculator-form {
@@ -116,34 +113,27 @@ function getCategoryQuantity($category, $houseArea) {
             font-weight: bold;
             font-size: 14px;
             display: block;
-            color: #1E3A8A; /* Dark blue for labels */
-            margin-bottom: 8px;
+            color: #666;
+            margin-bottom: 5px;
         }
 
         select,
         input[type="number"] {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #A3CFFA; /* Light blue border */
-            border-radius: 6px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
             font-size: 14px;
             outline: none;
-            background-color: #f9faff; /* Very light blue background for inputs */
-            transition: border-color 0.3s ease;
-        }
-
-        select:focus,
-        input[type="number"]:focus {
-            border-color: #4A90E2; /* Medium blue on focus */
         }
 
         button.next-button, input[type="submit"] {
-            background-color: #E53E3E; /* Red button */
-            color: #ffffff; /* White text */
+            background-color: #fdd835;
+            color: black;
             font-weight: bold;
-            padding: 12px 20px;
+            padding: 10px 15px;
             border: none;
-            border-radius: 6px;
+            border-radius: 5px;
             cursor: pointer;
             margin-top: 15px;
             margin-right: 10px;
@@ -151,7 +141,7 @@ function getCategoryQuantity($category, $houseArea) {
         }
 
         button.next-button:hover, input[type="submit"]:hover {
-            background-color: #C53030; /* Darker red on hover */
+            background-color: #fbc02d;
         }
 
         table {
@@ -159,7 +149,7 @@ function getCategoryQuantity($category, $houseArea) {
             max-width: 900px;
             border-collapse: collapse;
             margin: 20px 0;
-            background-color: #ffffff; /* White table background */
+            background-color: #fff;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -173,40 +163,29 @@ function getCategoryQuantity($category, $houseArea) {
         }
 
         th {
-            background-color: #4A90E2; /* Medium blue header */
-            color: #ffffff; /* White text */
+            background-color: #fdd835;
+            color: #333;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         tr {
-            border-bottom: 1px solid #A3CFFA; /* Light blue border */
+            border-bottom: 1px solid #eee;
             transition: background-color 0.3s ease;
         }
 
         tr:hover {
-            background-color: #E6F0FA; /* Very light blue on hover */
+            background-color: #f9f9f9;
         }
 
         td {
-            color: #1E3A8A; /* Dark blue text */
+            color: #555;
         }
 
         .row-cost {
             font-weight: bold;
-            color: #1E3A8A; /* Dark blue */
-        }
-
-        a {
-            color: #4A90E2; /* Medium blue for links */
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        a:hover {
-            color: #1E3A8A; /* Darker blue on hover */
+            color: #2c3e50;
         }
 
         @media (max-width: 600px) {
@@ -224,7 +203,7 @@ function getCategoryQuantity($category, $houseArea) {
 
             tr {
                 margin-bottom: 15px;
-                border: 1px solid #A3CFFA; /* Light blue border */
+                border: 1px solid #ddd;
                 border-radius: 5px;
             }
         }

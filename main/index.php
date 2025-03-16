@@ -1,12 +1,67 @@
 <?php
 session_start();
-
+$success = "";
+$error = "";
+$name = $email = $message = "";
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
   // Redirect to the login page
   header("Location: /Major-project/login/login.php");
   exit();
 }
+
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "buildwise";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+
+// Initialize variables for form feedback
+
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['form_id'] === "contact_form") {
+  echo "<pre>";
+  print_r($_POST);
+  echo "</pre>";
+  $name = htmlspecialchars(trim($_POST["name"] ?? ""));
+  $email = htmlspecialchars(trim($_POST["email"] ?? ""));
+  $message = htmlspecialchars(trim($_POST["message"] ?? ""));
+
+  if (empty($name) || empty($email) || empty($message)) {
+    echo "❌ All fields are required.";
+  } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    echo "❌ Invalid email format.";
+  } else {
+    $stmt = $conn->prepare("INSERT INTO contact_messages (name, email, message, status) VALUES (?, ?, ?, 'unread')");
+
+    if ($stmt) {
+      $stmt->bind_param("sss", $name, $email, $message);
+
+      if ($stmt->execute()) {
+        echo "✅ Message sent successfully!";
+      } else {
+        echo "❌ Error executing statement: " . $stmt->error;
+      }
+
+      $stmt->close();
+    } else {
+      echo "❌ Failed to prepare statement.";
+    }
+  }
+}
+
+$conn->close();
+
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -171,8 +226,8 @@ if (!isset($_SESSION['username'])) {
           <h2>Abouut Estimator</h2>
           <p>
             Lorem, ipsum dolor sit amet consectetur adipisicing elit. Explicabo libero maxime temporibus corrupti! Minus maxime exercitationem omnis inventore sit, repudiandae qui architecto. Vero nulla magnam mollitia consectetur molestiae expedita voluptate?
-        </p>
-        <div class="col-xs-12 col-md-4 text-center"><a href="../estimator/test.php" class="btn btn-custom btn-lg page-scroll">Free Estimate</a></div>
+          </p>
+          <div class="col-xs-12 col-md-4 text-center"><a href="../estimator/test.php" class="btn btn-custom btn-lg page-scroll">Free Estimate</a></div>
 
           <!--<h3>Why Choose Us?</h3>
           <div class="list-style">
@@ -473,62 +528,110 @@ if (!isset($_SESSION['username'])) {
   <!-- Contact Section -->
   <div id="contact">
     <div class="container">
-      <div class="col-md-8">
-        <div class="row">
+      <div class="row">
+
+
+        <div class="col-md-8">
           <div class="section-title">
             <h2>Get In Touch</h2>
             <p>Please fill out the form below to send us an email and we will get back to you as soon as possible.</p>
           </div>
-          <form name="sentMessage" id="contactForm" novalidate>
+          <form name="sentMessage" id="contactForm" method="POST" action="index.php" novalidate>
+            <input type="hidden" name="form_id" value="contact_form">
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
-                  <input type="text" id="name" class="form-control" placeholder="Name" required="required">
+                  <input type="text" name="name" id="name" class="form-control" placeholder="Name" value="<?php echo htmlspecialchars($name); ?>" required>
                   <p class="help-block text-danger"></p>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
-                  <input type="email" id="email" class="form-control" placeholder="Email" required="required">
+                  <input type="email" name="email" id="email" class="form-control" placeholder="Email" value="<?php echo htmlspecialchars($email); ?>" required>
                   <p class="help-block text-danger"></p>
                 </div>
               </div>
             </div>
             <div class="form-group">
-              <textarea name="message" id="message" class="form-control" rows="4" placeholder="Message" required></textarea>
+              <textarea name="message" id="message" class="form-control" rows="4" placeholder="Message" required><?php echo htmlspecialchars($message); ?></textarea>
               <p class="help-block text-danger"></p>
             </div>
-            <div id="success"></div>
+            <div id="success">
+              <?php if ($success) echo "<p class='text-success'>$success</p>"; ?>
+              <?php if ($error) echo "<p class='text-danger'>$error</p>"; ?>
+            </div>
             <button type="submit" class="btn btn-custom btn-lg">Send Message</button>
           </form>
         </div>
+        <div class="col-md-4 contact-info">
+          <div class="contact-item">
+            <h4>Contact Info</h4>
+            <p><span>Address</span> 4321 California St,<br> San Francisco, CA 12345</p>
+          </div>
+          <div class="contact-item">
+            <p><span>Phone</span> +1 123 456 1234</p>
+          </div>
+          <div class="contact-item">
+            <p><span>Email</span> info@company.com</p>
+          </div>
+        </div>
       </div>
-      <div class="col-md-3 col-md-offset-1 contact-info">
-        <div class="contact-item">
-          <h4>Contact Info</h4>
-          <p><span>Address</span>4321 California St,<br>
-            San Francisco, CA 12345</p>
-        </div>
-        <div class="contact-item">
-          <p><span>Phone</span> +1 123 456 1234</p>
-        </div>
-        <div class="contact-item">
-          <p><span>Email</span> info@company.com</p>
-        </div>
-      </div>
-      <div class="col-md-12">
-        <div class="row">
+      <div class="row">
+        <div class="col-md-12">
           <div class="social">
             <ul>
-              <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-              <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-              <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
-              <li><a href="#"><i class="fa fa-youtube"></i></a></li>
+              <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
+              <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+              <li><a href="#"><i class="fab fa-google-plus-g"></i></a></li>
+              <li><a href="#"><i class="fab fa-youtube"></i></a></li>
             </ul>
           </div>
         </div>
       </div>
     </div>
+
+    <script>
+      // Client-side validation
+      document.getElementById('contactForm').addEventListener('submit', function(event) {
+        let name = document.getElementById('name').value.trim();
+        let email = document.getElementById('email').value.trim();
+        let message = document.getElementById('message').value.trim();
+        let error = false;
+
+        if (!name) {
+          document.querySelector('#name + .help-block').textContent = "Name is required.";
+          document.querySelector('#name + .help-block').style.display = 'block';
+          error = true;
+        } else {
+          document.querySelector('#name + .help-block').style.display = 'none';
+        }
+
+        if (!email || !isValidEmail(email)) {
+          document.querySelector('#email + .help-block').textContent = "Valid email is required.";
+          document.querySelector('#email + .help-block').style.display = 'block';
+          error = true;
+        } else {
+          document.querySelector('#email + .help-block').style.display = 'none';
+        }
+
+        if (!message) {
+          document.querySelector('#message + .help-block').textContent = "Message is required.";
+          document.querySelector('#message + .help-block').style.display = 'block';
+          error = true;
+        } else {
+          document.querySelector('#message + .help-block').style.display = 'none';
+        }
+
+        if (error) {
+          event.preventDefault();
+        }
+      });
+
+      function isValidEmail(email) {
+        let re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+      }
+    </script>
   </div>
   <!-- Footer Section -->
   <div id="footer">
