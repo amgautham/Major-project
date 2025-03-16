@@ -9,27 +9,41 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Check if user is logged in
 if (!isset($_SESSION['username'])) {
-    // Redirect to the login page
-    header("Location: /Major-project/login/login.php");
+    header("Location: /Major-project/login/login.php"); // Redirect to login if not logged in
     exit();
-  }
+}
 
-// Fetch dealers with their district names
-$query = "SELECT d.*, dist.district_name 
-          FROM dealers d 
-          JOIN districts dist ON d.district_id = dist.district_id 
-          ORDER BY dist.district_name, d.name";
-$result = $conn->query($query);
+// Fetch all districts for the dropdown
+$districts_query = "SELECT * FROM districts ORDER BY district_name";
+$districts_result = $conn->query($districts_query);
+$districts = $districts_result->fetch_all(MYSQLI_ASSOC);
 
-// Group dealers by district
-$dealers_by_district = [];
-while ($row = $result->fetch_assoc()) {
-    $district_name = $row['district_name'];
-    if (!isset($dealers_by_district[$district_name])) {
-        $dealers_by_district[$district_name] = [];
+// Determine the selected district (default to none)
+$selected_district_id = isset($_GET['district_id']) && $_GET['district_id'] !== '' ? (int)$_GET['district_id'] : null;
+$selected_district_name = null;
+$dealers = [];
+
+// Fetch dealers if a district is selected
+if ($selected_district_id) {
+    $stmt = $conn->prepare("SELECT d.*, dist.district_name 
+                           FROM dealers d 
+                           JOIN districts dist ON d.district_id = dist.district_id 
+                           WHERE d.district_id = ? 
+                           ORDER BY d.name");
+    $stmt->bind_param("i", $selected_district_id);
+    $stmt->execute();
+    $dealers = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+
+    // Get the selected district name
+    foreach ($districts as $district) {
+        if ($district['district_id'] == $selected_district_id) {
+            $selected_district_name = $district['district_name'];
+            break;
+        }
     }
-    $dealers_by_district[$district_name][] = $row;
 }
 ?>
 
@@ -60,12 +74,42 @@ while ($row = $result->fetch_assoc()) {
             margin-bottom: 20px;
         }
 
-        .district-section {
+        .filter-form {
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 300px;
+            text-align: left;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 14px;
+            display: block;
+            color: #1E3A8A;
+            margin-bottom: 8px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #A3CFFA;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            background-color: #f9faff;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus {
+            border-color: #4A90E2;
+        }
+
+        .dealer-section {
             width: 100%;
             margin-bottom: 30px;
         }
 
-        .district-section h2 {
+        .dealer-section h2 {
             color: #1E3A8A;
             font-size: 22px;
             font-weight: 600;
@@ -123,7 +167,11 @@ while ($row = $result->fetch_assoc()) {
                 padding: 20px;
             }
 
-            .district-section h2 {
+            .filter-form {
+                max-width: 100%;
+            }
+
+            .dealer-section h2 {
                 font-size: 18px;
             }
 
@@ -137,24 +185,38 @@ while ($row = $result->fetch_assoc()) {
     <div class="container">
         <h1>View Dealers</h1>
 
-        <?php if (empty($dealers_by_district)): ?>
-            <p>No dealers found.</p>
+        <!-- District Filter Dropdown -->
+        <form method="GET" class="filter-form">
+            <label for="district_id">Select District:</label>
+            <select name="district_id" id="district_id" onchange="this.form.submit()">
+                <option value="">-- Select a District --</option>
+                <?php foreach ($districts as $district): ?>
+                    <option value="<?php echo $district['district_id']; ?>" 
+                            <?php echo $selected_district_id == $district['district_id'] ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($district['district_name']); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </form>
+
+        <?php if ($selected_district_id === null): ?>
+            <p>Please select a district to view dealers.</p>
+        <?php elseif (empty($dealers)): ?>
+            <p>No dealers found in <?php echo htmlspecialchars($selected_district_name); ?>.</p>
         <?php else: ?>
-            <?php foreach ($dealers_by_district as $district_name => $dealers): ?>
-                <div class="district-section">
-                    <h2><?php echo htmlspecialchars($district_name); ?> Dealers</h2>
-                    <div class="dealer-list">
-                        <?php foreach ($dealers as $dealer): ?>
-                            <div class="dealer-item">
-                                <h3><?php echo htmlspecialchars($dealer['name']); ?></h3>
-                                <p><strong>Address:</strong> <?php echo htmlspecialchars($dealer['address']); ?></p>
-                                <p><strong>Phone:</strong> <?php echo htmlspecialchars($dealer['phone']); ?></p>
-                                <p><strong>Rating:</strong> <?php echo htmlspecialchars($dealer['rating'] ?? 'N/A'); ?>/5</p>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
+            <div class="dealer-section">
+                <h2><?php echo htmlspecialchars($selected_district_name); ?> Dealers</h2>
+                <div class="dealer-list">
+                    <?php foreach ($dealers as $dealer): ?>
+                        <div class="dealer-item">
+                            <h3><?php echo htmlspecialchars($dealer['name']); ?></h3>
+                            <p><strong>Address:</strong> <?php echo htmlspecialchars($dealer['address']); ?></p>
+                            <p><strong>Phone:</strong> <?php echo htmlspecialchars($dealer['phone']); ?></p>
+                            <p><strong>Rating:</strong> <?php echo htmlspecialchars($dealer['rating'] ?? 'N/A'); ?>/5</p>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
-            <?php endforeach; ?>
+            </div>
         <?php endif; ?>
 
         <a href="../login/logout.php" class="logout-link">Logout</a>
