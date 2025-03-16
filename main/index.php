@@ -75,8 +75,8 @@ if (!isset($_SESSION['username'])) {
         <ul class="nav navbar-nav navbar-right">
           <li><a href="#about" class="page-scroll">Introduction</a></li>
           <li><a href="#services" class="page-scroll">Estimator</a></li>
-          <li><a href="#portfolio" class="page-scroll">Contact dealers</a></li>
-          <li><a href="#testimonials" class="page-scroll">Models</a></li>
+          <li><a href="#portfolio" class="page-scroll">Models</a></li>
+          <li><a href="#testimonials" class="page-scroll">Contact dealers</a></li>
           <li><a href="#contact" class="page-scroll">Contact us</a></li>
           <!--<li><a href="../login/logout.php" class="page-scroll">Logout</a></li>-->
         </ul>
@@ -121,25 +121,23 @@ if (!isset($_SESSION['username'])) {
         <!--<div class="col-xs-12 col-md-6">!-->
         <div class="about-text">
           <h2>About Lowcost Housing</h2>
-          <p>Low Cost Housing is a new concept which deals with effective budgeting and following of techniques which help in reducing the cost construction through the use of locally available materials along with improved skills and technology without sacrificing the strength, performance and life of the structure.There is huge misconception that low cost housing is suitable for only sub standard works and they are constructed by utilizing cheap building materials of low quality.The fact is that Low cost housing is done by proper management of resources.Economy is also achieved by postponing finishing works or implementing them in phases.Building Cost
-            The building construction cost can be divided into two parts namely:
-            Building material cost : 65 to 70 %
-            Labour cost : 65 to 70 %
-            Now in low cost housing, building material cost is less because we make use of the locally available materials and also the labour cost can be reduced by properly making the time schedule of our work. Cost of reduction is achieved by selection of more efficient material or by an improved design.
+          <p>Welcome to BuildWise – your comprehensive solution for accurate, real-time low-cost housing estimation.
 
-
-            Areas from where cost can be reduced are:-<br>
-            <br>1) Reduce plinth area by using thinner wall concept.Ex.15 cms thick solid concrete block wall.
-
-            <br>2) Use locally available material in an innovative form like soil cement blocks in place of burnt brick.
-
-            <br>3) Use energy efficiency materials which consumes less energy like concrete block in place of burnt brick.
-
-            <br>4) Use environmentally friendly materials which are substitute for conventional building components like use R.C.C. Door and window frames in place of wooden frames.
-            <br>5) Preplan every component of a house and rationalize the design procedure for reducing the size of the component in the building.
-            <br>6) By planning each and every component of a house the wastage of materials due to demolition of the unplanned component of the house can be avoided.
-
-            <br>7) Each component of the house shall be checked whether if it’s necessary, if it is not necessary, then that component should not be used.
+BuildWise empowers homeowners, builders, and planners to confidently plan their construction projects by providing:
+<br>
+Precise Cost Estimation:<br>
+Quickly calculate material requirements and cost breakdowns based on your district, total area, and BHK configuration.
+<br>
+Flexible Material Selection:<br>
+Choose between manual selection or our innovative Best Preference feature, which auto-selects the highest priority material options based on expert recommendations.
+<br>
+Real-Time Pricing:<br>
+Utilize up-to-date, district-specific material pricing to ensure your estimates are both reliable and relevant.
+<br>
+Future-Ready Features:<br>
+Soon, you’ll also be able to connect directly with trusted local dealers and contractors, making it even easier to bring your project to life.
+<br>
+Experience a smarter, simpler way to build your dream home – right here at BuildWise.
           </p>
 
           <!--<h3>Why Choose Us?</h3>
@@ -176,10 +174,20 @@ if (!isset($_SESSION['username'])) {
         <!--<div class="col-xs-12 col-md-6"> <img src="img/about.jpg" class="img-responsive" alt=""> </div>!-->
         <!--<div class="col-xs-12 col-md-6">!-->
         <div class="about-text">
-          <h2>Abouut Estimator</h2>
+          <h2>About Estimator</h2>
           <p>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Explicabo libero maxime temporibus corrupti! Minus maxime exercitationem omnis inventore sit, repudiandae qui architecto. Vero nulla magnam mollitia consectetur molestiae expedita voluptate?
-          </p>
+Our <strong>Low-Cost Housing Estimator</strong> is a powerful, user-friendly tool designed to simplify the often complex process of budgeting for home construction.<br>
+It enables users to quickly generate a detailed cost breakdown by taking into account factors such as total area, BHK configuration, and district-specific material pricing.<br><br>
+
+Key features include:<br>
+- <strong>Dynamic Material Calculation:</strong> Leveraging smart formulas, the estimator calculates the quantity of materials required for various construction components like flooring, walls, and roofing.<br>
+- <strong>Flexible Selection Options:</strong> Users can choose to manually select material types or let the system auto-select the best options based on priority, ensuring both ease of use and accuracy.<br>
+- <strong>Real-Time Pricing Data:</strong> With regularly updated district-specific pricing, the estimator provides current and reliable cost estimates.<br>
+- <strong>Clear Visual Feedback:</strong> A comprehensive, easy-to-understand cost breakdown and graphical charts help users visualize their budget allocation.<br><br>
+
+Whether you're a homeowner, contractor, or planner, our estimator is engineered to offer transparency, precision, and efficiency—making your construction planning smoother and more cost-effective.
+</p>
+
           <div class="col-xs-12 col-md-4 text-center"><a href="../estimator/test.php" class="btn btn-custom btn-lg page-scroll">Free Estimate</a></div>
 
           <!--<h3>Why Choose Us?</h3>
@@ -315,7 +323,7 @@ if (!isset($_SESSION['username'])) {
   <div id="portfolio">
     <div class="container">
       <div class="section-title">
-        <h2>Contact dealers</h2>
+        <h2>Models</h2>
       </div>
       <div class="row">
         <div class="portfolio-items">
@@ -417,63 +425,35 @@ if (!isset($_SESSION['username'])) {
   <div id="testimonials">
     <div class="container">
       <div class="section-title">
-        <h2>>???</h2>
+        <h2>Contact dealers </h2>
       </div>
-      <div class="row">
-        <div class="col-md-4">
-          <div class="testimonial">
-            <div class="testimonial-image"> <img src="img/testimonials/01.jpg" alt=""> </div>
-            <div class="testimonial-content">
-              <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed dapibus leo nec ornare diam sedasd commodo nibh ante facilisis bibendum dolor feugiat at."</p>
-              <div class="testimonial-meta"> - John Doe </div>
+      <div class="about-text">
+          
+      <p>
+Our <strong>Contact Dealers</strong> feature is designed to connect you with trusted local dealers who can assist with your construction needs.<br>
+It provides easy access to essential dealer information such as name, address, district, phone, and even a Google Maps rating to help you make informed decisions.<br><br>
+
+This feature allows you to quickly identify and reach out to dealers in your area, ensuring you get timely assistance and accurate quotes for materials and services.<br>
+By centralizing dealer contacts, we streamline communication and enhance your overall project planning experience.
+</p>
+
+
+          <div class="col-xs-12 col-md-4 text-center"><a href="../estimator/test.php" class="btn btn-custom btn-lg page-scroll">Contact Dealers</a></div>
+
+          <!--<h3>Why Choose Us?</h3>
+          <div class="list-style">
+            <div class="col-lg-6 col-sm-6 col-xs-12">
+              <p></p>
             </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="testimonial">
-            <div class="testimonial-image"> <img src="img/testimonials/02.jpg" alt=""> </div>
-            <div class="testimonial-content">
-              <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed dapibus leo nec ornare diam sedasd commodo nibh ante facilisis."</p>
-              <div class="testimonial-meta"> - Johnathan Doe </div>
+            <div class="col-lg-6 col-sm-6 col-xs-12">
+              <ul>
+                <li>Free Consultation</li>
+                <li>Satisfied Customers</li>
+                <li>Project Management</li>
+                <li>Affordable Pricing</li>
+              </ul>
             </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="testimonial">
-            <div class="testimonial-image"> <img src="img/testimonials/03.jpg" alt=""> </div>
-            <div class="testimonial-content">
-              <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed dapibus leo nec ornare diam sedasd commodo nibh ante facilisis bibendum dolor feugiat at."</p>
-              <div class="testimonial-meta"> - John Doe </div>
-            </div>
-          </div>
-        </div>
-        <div class="row"> </div>
-        <div class="col-md-4">
-          <div class="testimonial">
-            <div class="testimonial-image"> <img src="img/testimonials/04.jpg" alt=""> </div>
-            <div class="testimonial-content">
-              <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed dapibus leo nec ornare diam sedasd commodo nibh ante facilisis bibendum dolor feugiat at."</p>
-              <div class="testimonial-meta"> - Johnathan Doe </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="testimonial">
-            <div class="testimonial-image"> <img src="img/testimonials/05.jpg" alt=""> </div>
-            <div class="testimonial-content">
-              <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed dapibus leo nec ornare diam sedasd commodo nibh ante facilisis bibendum dolor feugiat at."</p>
-              <div class="testimonial-meta"> - John Doe </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="testimonial">
-            <div class="testimonial-image"> <img src="img/testimonials/06.jpg" alt=""> </div>
-            <div class="testimonial-content">
-              <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed dapibus leo nec ornare diam sedasd commodo nibh ante facilisis."</p>
-              <div class="testimonial-meta"> - Johnathan Doe </div>
-            </div>
-          </div>
+          </div>!-->
         </div>
       </div>
     </div>

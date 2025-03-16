@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 16, 2025 at 11:13 AM
+-- Generation Time: Mar 16, 2025 at 04:43 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -34,6 +34,22 @@ CREATE TABLE `contact_messages` (
   `message` text NOT NULL,
   `status` enum('unread','read') DEFAULT 'unread',
   `submitted_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `dealers`
+--
+
+CREATE TABLE `dealers` (
+  `dealer_id` int(11) NOT NULL,
+  `district_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `address` varchar(255) NOT NULL,
+  `rating` decimal(3,2) DEFAULT NULL,
+  `phone` varchar(50) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -202,6 +218,13 @@ ALTER TABLE `contact_messages`
   ADD PRIMARY KEY (`message_id`);
 
 --
+-- Indexes for table `dealers`
+--
+ALTER TABLE `dealers`
+  ADD PRIMARY KEY (`dealer_id`),
+  ADD KEY `district_id` (`district_id`);
+
+--
 -- Indexes for table `districts`
 --
 ALTER TABLE `districts`
@@ -240,6 +263,12 @@ ALTER TABLE `contact_messages`
   MODIFY `message_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `dealers`
+--
+ALTER TABLE `dealers`
+  MODIFY `dealer_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `districts`
 --
 ALTER TABLE `districts`
@@ -266,6 +295,12 @@ ALTER TABLE `users`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `dealers`
+--
+ALTER TABLE `dealers`
+  ADD CONSTRAINT `dealers_ibfk_1` FOREIGN KEY (`district_id`) REFERENCES `districts` (`district_id`);
 
 --
 -- Constraints for table `material_prices`
