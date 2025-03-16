@@ -11,56 +11,134 @@ if ($conn->connect_error) {
 
 /**
  * getCategoryQuantity
- * Returns how much area (or quantity) is needed for each category.
- * 
- * @param string $category   E.g., "BATHROOM FLOORING", "BATHROOM WALL", "CEILING", etc.
- * @param float  $houseArea  The total house area (sq.ft) user entered.
+ * Returns the estimated quantity of material required based on the material category and house area.
+ *
+ * NOTE for Admin (Civil Engineer):
+ * If you need to adjust these formulas based on local construction guidelines, simply update the multipliers,
+ * wastage factors, or any constant values in the switch cases below.
+ *
+ * For example, if the guideline for brick usage changes (currently assumed as 20 bricks per sq.ft),
+ * modify that value accordingly. Also note that for bricks, since the price is per 1000 bricks,
+ * the total brick count is divided by 1000 to yield the number of "thousands" required.
+ *
+ * @param string $category   The material category (e.g., "BATHROOM FLOORING", "BRICK", "DOORS", etc.)
+ * @param float  $houseArea  The total house area (sq.ft) entered by the user.
+ * @return int               The estimated quantity (rounded up) for that material.
  */
 function getCategoryQuantity($category, $houseArea) {
+    // Convert category to uppercase for consistent matching.
     $cat = strtoupper($category);
 
     switch ($cat) {
+        // Bathroom Flooring:
+        // - Bathrooms cover about 8% of the house area.
+        // - Each tile covers 4 sq.ft (assumed tile size: 2ft x 2ft).
+        // - Add 10% extra for wastage.
         case 'BATHROOM FLOORING':
             $bathFloorArea = $houseArea * 0.08;
             $tilesNeeded = ($bathFloorArea / 4.0) * 1.1;
             return ceil($tilesNeeded);
 
+        // Bathroom Wall:
+        // - Assume the wall area for bathrooms is roughly three times the bathroom floor area.
+        // - Add 10% extra for wastage.
         case 'BATHROOM WALL':
             $bathWallArea = ($houseArea * 0.08) * 3;
             $tilesNeeded = $bathWallArea * 1.1;
             return ceil($tilesNeeded);
 
+        // Ceiling:
+        // - The ceiling area is approximately equal to the house area.
         case 'CEILING':
             return ceil($houseArea);
 
+        // Flooring:
+        // - Main flooring is assumed to cover the entire house area.
         case 'FLOORING':
             return ceil($houseArea);
 
+        // Kitchen Cabinets:
+        // - Assume kitchen cabinet work covers roughly 10% of the house area.
         case 'KITCHEN CABINETS':
-            $cabinetQty = $houseArea * 0.10;
-            return ceil($cabinetQty);
+            return ceil($houseArea * 0.10);
 
+        // Kitchen Countertops:
+        // - Estimate countertop area as 5% of the house area.
         case 'KITCHEN COUNTERTOPS':
-            $counterArea = $houseArea * 0.05;
-            return ceil($counterArea);
+            return ceil($houseArea * 0.05);
 
+        // Kitchen Flooring:
+        // - Assume kitchen floor area is about 7% of the house area.
         case 'KITCHEN FLOORING':
-            $kitchFloor = $houseArea * 0.07;
-            return ceil($kitchFloor);
+            return ceil($houseArea * 0.07);
 
+        // Kitchen Wall Tiles:
+        // - Assume the wall tiling area in the kitchen is 3 times the kitchen area (7% each),
+        //   then add 10% extra for wastage.
         case 'KITCHEN WALL TILES':
-            $kitchWall = ($houseArea * 0.07) * 3;
-            $tilesNeeded = $kitchWall * 1.1;
-            return ceil($tilesNeeded);
+            $kitchWallArea = ($houseArea * 0.07) * 3;
+            return ceil($kitchWallArea * 1.1);
 
+        // Roofing:
+        // - Assume roofing requires 110% of the house area (to account for overhangs).
         case 'ROOFING':
-            $roofArea = $houseArea * 1.1;
-            return ceil($roofArea);
+            return ceil($houseArea * 1.1);
 
+        // Stone:
+        // - Estimate stone quantity as 10% of the house area.
+        case 'STONE':
+            return ceil($houseArea * 0.10);
+
+        // Brick:
+        // - Assume a guideline of 20 bricks per square foot.
+        // - Since brick prices are quoted per 1000 bricks, we convert the total brick count into "thousands".
+        //   Formula: total bricks = houseArea * 20; then, quantity (in thousands) = ceil(total_bricks / 1000)
+        case 'BRICK':
+            return ceil(($houseArea * 20) / 1000);
+
+        // Wall:
+        // - For wall construction (other than bricks), assume material required is 1.5 times the house area.
+        case 'WALL':
+            return 100; //ceil($houseArea * 1.5);
+
+        // Doors:
+        // - Estimate one door for every 1000 sq.ft of house area.
+        case 'DOORS':
+            return ceil($houseArea / 1000);
+
+        // Window:
+        // - Estimate two windows for every 1000 sq.ft of house area.
+        case 'WINDOW':
+            return ceil(($houseArea / 1000) * 2);
+
+        // Plumbing:
+        // - Assume one complete set of plumbing fixtures is required per house.
+        case 'PLUMBING':
+            return 1;
+
+        // Bond (Mortar):
+        // - Estimate the required mortar as 5% of the house area.
+        case 'BOND':
+            return ceil($houseArea * 0.05);
+
+        // Kitchen Sink:
+        // - Typically, one kitchen sink is sufficient.
+        case 'KITCHEN SINK':
+            return 1;
+
+        // Kitchen Faucets:
+        // - Assume one set of faucets is sufficient.
+        case 'KITCHEN FAUCETS':
+            return 1;
+
+        // Default:
+        // - If the category is unrecognized, return the house area as a fallback quantity.
         default:
-            return ceil($houseArea);
+            return 40; // ceil($houseArea);
     }
 }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -308,7 +386,7 @@ function getCategoryQuantity($category, $houseArea) {
                       </tr>";
 
                 // Define material images
-                $material_images = [
+                /*$material_images = [
                     'cement' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-ceme.png',
                     'steel' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-stee.png',
                     'bricks' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-bric.png',
@@ -326,7 +404,7 @@ function getCategoryQuantity($category, $houseArea) {
                     'kitchen flooring' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-floo.png',
                     'kitchen wall tiles' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-floo.png',
                     'roofing' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-floo.png'
-                ];
+                ];*/
 
                 while ($row = $result->fetch_assoc()) {
                     $material_id = $row['material_id'];
