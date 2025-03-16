@@ -536,7 +536,7 @@ $conn->close();
             <h2>Get In Touch</h2>
             <p>Please fill out the form below to send us an email and we will get back to you as soon as possible.</p>
           </div>
-          <form name="sentMessage" id="contactForm" method="POST" action="index.php" novalidate>
+          <form name="sentMessage" id="contactForm" method="POST"  novalidate>
             <input type="hidden" name="form_id" value="contact_form">
             <div class="row">
               <div class="col-md-6">
