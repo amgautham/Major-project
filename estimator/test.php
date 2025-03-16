@@ -378,7 +378,9 @@ function getCategoryQuantity($category, $houseArea) {
         }
         ?>
     </form>
-
+    <br>
+    <a href="../main/emical/EmIcalc.html">EMI Calc Here</a>
+        
     <?php if (isset($_POST['calculate_estimation']) && !empty($labels)): ?>
         <h3>Cost Breakdown by Category (%)</h3>
         <div style="max-width: 800px; margin: 20px auto; width: 100%;">

@@ -101,7 +101,7 @@ if (!isset($_SESSION['username'])) {
           <p>Take the first step toward your budget-friendly dream home today!
           </p>
         </div>
-        <div class="col-xs-12 col-md-4 text-center"><a href="../calculations/test.php" class="btn btn-custom btn-lg page-scroll">Free Estimate</a></div>
+        <div class="col-xs-12 col-md-4 text-center"><a href="../estimator/test.php" class="btn btn-custom btn-lg page-scroll">Free Estimate</a></div>
       </div>
     </div>
   </div>
@@ -172,7 +172,7 @@ if (!isset($_SESSION['username'])) {
           <p>
             Lorem, ipsum dolor sit amet consectetur adipisicing elit. Explicabo libero maxime temporibus corrupti! Minus maxime exercitationem omnis inventore sit, repudiandae qui architecto. Vero nulla magnam mollitia consectetur molestiae expedita voluptate?
         </p>
-        <div class="col-xs-12 col-md-4 text-center"><a href="../calculations/test.php" class="btn btn-custom btn-lg page-scroll">Free Estimate</a></div>
+        <div class="col-xs-12 col-md-4 text-center"><a href="../estimator/test.php" class="btn btn-custom btn-lg page-scroll">Free Estimate</a></div>
 
           <!--<h3>Why Choose Us?</h3>
           <div class="list-style">
