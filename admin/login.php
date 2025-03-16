@@ -3,7 +3,7 @@ session_start();
 
 // Database connection
 $host = 'localhost';
-$dbname = 'low_cost_housing';
+$dbname = 'buildwise';
 $username = 'root';
 $password = '';
 
