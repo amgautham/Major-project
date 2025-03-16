@@ -136,8 +136,8 @@ function getCategoryQuantity($category, $houseArea) {
         input[type="number"]:focus {
             border-color: #4A90E2; /* Medium blue on focus */
         }
-
-        button.next-button, input[type="submit"] {
+        
+        button.next-button, input[type="submit"], button.action-button {
             background-color: #E53E3E; /* Red button */
             color: #ffffff; /* White text */
             font-weight: bold;
@@ -150,8 +150,15 @@ function getCategoryQuantity($category, $houseArea) {
             transition: background-color 0.3s ease;
         }
 
-        button.next-button:hover, input[type="submit"]:hover {
+        button.next-button:hover, input[type="submit"]:hover, button.action-button:hover {
             background-color: #C53030; /* Darker red on hover */
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px; /* Space between buttons */
+            margin-top: 20px;
         }
 
         table {
@@ -226,6 +233,16 @@ function getCategoryQuantity($category, $houseArea) {
                 margin-bottom: 15px;
                 border: 1px solid #A3CFFA; /* Light blue border */
                 border-radius: 5px;
+            }
+
+            .button-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            button.action-button {
+                width: 100%;
+                max-width: 200px;
             }
         }
     </style>
@@ -436,12 +453,16 @@ function getCategoryQuantity($category, $houseArea) {
             echo "<input type='submit' name='load_materials' value='Load Materials'> ";
             echo "<input type='submit' name='best_preference' value='Best Preference'>";
         } else {
+            echo "<div class='button-container'>";
             echo "<input type='submit' name='calculate_estimation' value='Calculate Estimation'>";
+            echo "<button type='button' class='action-button' onclick='window.print()'>Print</button>";
+            echo "</div>";
         }
         ?>
     </form>
-    <br>
-    <a href="../main/emical/EmIcalc.html">EMI Calc Here</a>
+    <div class="button-container">
+        <a href="../main/emical/EmIcalc.html"><button type="button" class="action-button">EMI Calculator</button></a>
+    </div>
 
     <?php if (isset($_POST['calculate_estimation']) && !empty($labels)): ?>
         <h3>Cost Breakdown by Category</h3>
