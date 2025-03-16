@@ -78,7 +78,7 @@ if (!isset($_SESSION['username'])) {
           <li><a href="#portfolio" class="page-scroll">Models</a></li>
           <li><a href="#testimonials" class="page-scroll">Contact dealers</a></li>
           <li><a href="#contact" class="page-scroll">Contact us</a></li>
-          <!--<li><a href="../login/logout.php" class="page-scroll">Logout</a></li>-->
+          <li><a href="../login/logout.php" class="page-scroll">Logout</a></li>
         </ul>
       </div>
       <!-- /.navbar-collapse -->
