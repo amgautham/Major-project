@@ -1,14 +1,10 @@
 <?php
-// Database connection
 require_once 'db_connect.php';
-session_start();
-
 if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
+    // Redirect to the login page if not set or not admin
     header("Location: /Major-project/admin/login.php");
     exit();
 }
-
-// Admin Management Variables
 $items_per_page = 10;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $items_per_page;
@@ -22,34 +18,32 @@ if (isset($_POST['delete'])) {
     $material_id = $_POST['material_id'];
     $stmt = $pdo->prepare("DELETE FROM material_prices WHERE district_id = ? AND material_id = ?");
     $stmt->execute([$district_id, $material_id]);
-    header("Location: " . $_SERVER['PHP_SELF'] . "?page=$page&sort=$sort&order=$order&search=" . urlencode($search));
-    exit();
 }
 
 // Handle add
 if (isset($_POST['add'])) {
     $district_id = $_POST['district_id'];
     $material_id = $_POST['material_id'];
-    $material_type = $_POST['material_type'];
-    $price = (float)$_POST['price'];
+    $low_price = (float)$_POST['low_price'];
+    $medium_price = (float)$_POST['medium_price'];
+    $high_price = (float)$_POST['high_price'];
     
-    $stmt = $pdo->prepare("INSERT INTO material_prices (district_id, material_id, material_type, price, last_updated) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)");
-    $stmt->execute([$district_id, $material_id, $material_type, $price]);
-    header("Location: " . $_SERVER['PHP_SELF'] . "?page=$page&sort=$sort&order=$order&search=" . urlencode($search));
-    exit();
+    $stmt = $pdo->prepare("INSERT INTO material_prices (district_id, material_id, low_price, medium_price, high_price, last_updated) 
+                          VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)");
+    $stmt->execute([$district_id, $material_id, $low_price, $medium_price, $high_price]);
 }
 
 // Handle edit
 if (isset($_POST['edit'])) {
     $district_id = $_POST['district_id'];
     $material_id = $_POST['material_id'];
-    $material_type = $_POST['material_type'];
-    $price = (float)$_POST['price'];
+    $low_price = (float)$_POST['low_price'];
+    $medium_price = (float)$_POST['medium_price'];
+    $high_price = (float)$_POST['high_price'];
     
-    $stmt = $pdo->prepare("UPDATE material_prices SET material_type = ?, price = ?, last_updated = CURRENT_TIMESTAMP WHERE district_id = ? AND material_id = ?");
-    $stmt->execute([$material_type, $price, $district_id, $material_id]);
-    header("Location: " . $_SERVER['PHP_SELF'] . "?page=$page&sort=$sort&order=$order&search=" . urlencode($search));
-    exit();
+    $stmt = $pdo->prepare("UPDATE material_prices SET low_price = ?, medium_price = ?, high_price = ?, last_updated = CURRENT_TIMESTAMP 
+                          WHERE district_id = ? AND material_id = ?");
+    $stmt->execute([$low_price, $medium_price, $high_price, $district_id, $material_id]);
 }
 
 // Fetch districts and materials for dropdowns
@@ -59,14 +53,14 @@ $districts = $districts_stmt->fetchAll(PDO::FETCH_ASSOC);
 $materials_stmt = $pdo->query("SELECT material_id, material_name FROM materials");
 $materials = $materials_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$allowed_sorts = ['district_id', 'material_id', 'material_type', 'price', 'last_updated'];
+$allowed_sorts = ['district_id', 'material_id', 'low_price', 'medium_price', 'high_price', 'last_updated'];
 $sort = in_array($sort, $allowed_sorts) ? $sort : 'district_id';
 
 $count_stmt = $pdo->prepare("SELECT COUNT(*) FROM material_prices mp 
                            JOIN materials m ON mp.material_id = m.material_id 
                            JOIN districts d ON mp.district_id = d.district_id 
-                           WHERE m.material_name LIKE ? OR d.district_name LIKE ? OR mp.material_type LIKE ?");
-$count_stmt->execute(["%$search%", "%$search%", "%$search%"]);
+                           WHERE m.material_name LIKE ? OR d.district_name LIKE ?");
+$count_stmt->execute(["%$search%", "%$search%"]);
 $total_items = $count_stmt->fetchColumn();
 $total_pages = ceil($total_items / $items_per_page);
 
@@ -74,22 +68,21 @@ $stmt = $pdo->prepare("SELECT mp.*, m.material_name, d.district_name
                       FROM material_prices mp
                       JOIN materials m ON mp.material_id = m.material_id
                       JOIN districts d ON mp.district_id = d.district_id
-                      WHERE m.material_name LIKE ? OR d.district_name LIKE ? OR mp.material_type LIKE ?
+                      WHERE m.material_name LIKE ? OR d.district_name LIKE ?
                       ORDER BY $sort $order LIMIT ? OFFSET ?");
 $stmt->bindValue(1, "%$search%", PDO::PARAM_STR);
 $stmt->bindValue(2, "%$search%", PDO::PARAM_STR);
-$stmt->bindValue(3, "%$search%", PDO::PARAM_STR);
-$stmt->bindValue(4, (int)$items_per_page, PDO::PARAM_INT);
-$stmt->bindValue(5, (int)$offset, PDO::PARAM_INT);
+$stmt->bindValue(3, (int)$items_per_page, PDO::PARAM_INT);
+$stmt->bindValue(4, (int)$offset, PDO::PARAM_INT);
 $stmt->execute();
 $prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Admin - Material Prices</title>
+    <title>Material Prices - Admin</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background-color: #f5f5f5; color: #333; line-height: 1.6; }
@@ -111,7 +104,11 @@ $prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
         th a:hover { color: #3498db; }
         td a { color: #3498db; text-decoration: none; margin-right: 10px; }
         td a:hover { text-decoration: underline; }
-        td:nth-child(3), td:nth-child(4) { text-align: right; font-family: monospace; }
+        td:nth-child(3), td:nth-child(4), td:nth-child(5) { text-align: right; font-family: monospace; }
+        .container > a { display: inline-block; padding: 8px 12px; margin: 0 5px 10px 0; background-color: white; color: #3498db; text-decoration: none; border: 1px solid #ddd; border-radius: 4px; transition: all 0.3s; }
+        .container > a:hover { background-color: #3498db; color: white; border-color: #3498db; }
+        
+        /* New styles for add/edit */
         .add-form, .edit-modal { margin-bottom: 20px; padding: 15px; background-color: white; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .edit-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; width: 90%; max-width: 400px; }
         .edit-modal.active { display: block; }
@@ -120,8 +117,7 @@ $prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .close-btn { float: right; color: #e74c3c; cursor: pointer; font-weight: bold; }
         input[name="delete"] { background-color: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; transition: background-color 0.3s; }
         input[name="delete"]:hover { background-color: #c0392b; }
-        .pagination a { display: inline-block; padding: 8px 12px; margin: 0 5px 10px 0; background-color: white; color: #3498db; text-decoration: none; border: 1px solid #ddd; border-radius: 4px; transition: all 0.3s; }
-        .pagination a:hover { background-color: #3498db; color: white; border-color: #3498db; }
+
         @media (max-width: 768px) {
             .container { padding: 70px 10px 10px; }
             table { font-size: 14px; }
@@ -134,11 +130,8 @@ $prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body>
     <div class="navbar">
         <a href="../admin/menu.php" class="logout-link">MENU</a>
-        <h2>Admin - Material Prices</h2>
-        <div>
-            <a href="../estimator/test.php" class="logout-link">Cost Estimation</a>
-            <a href="../login/logout.php" class="logout-link">Logout</a>
-        </div>
+        <h2>Material Prices Management</h2>
+        <a href="../login/logout.php" class="logout-link">Logout</a>
     </div>
 
     <div class="container">
@@ -158,8 +151,9 @@ $prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <option value="<?php echo $material['material_id']; ?>"><?php echo htmlspecialchars($material['material_name']); ?></option>
                     <?php endforeach; ?>
                 </select>
-                <input type="text" name="material_type" placeholder="Material Type (e.g., Fly Ash Brick)" required>
-                <input type="number" step="0.01" name="price" placeholder="Price" required>
+                <input type="number" step="0.01" name="low_price" placeholder="Low Price" required>
+                <input type="number" step="0.01" name="medium_price" placeholder="Medium Price" required>
+                <input type="number" step="0.01" name="high_price" placeholder="High Price" required>
                 <input type="submit" name="add" value="Add Price">
             </form>
         </div>
@@ -173,26 +167,29 @@ $prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <!-- Prices Table -->
         <table>
             <tr>
-                <th><a href="?sort=district_id&order=<?php echo $order === 'ASC' ? 'DESC' : 'ASC'; ?>&search=<?php echo urlencode($search); ?>">District</a></th>
-                <th><a href="?sort=material_id&order=<?php echo $order === 'ASC' ? 'DESC' : 'ASC'; ?>&search=<?php echo urlencode($search); ?>">Material</a></th>
-                <th><a href="?sort=material_type&order=<?php echo $order === 'ASC' ? 'DESC' : 'ASC'; ?>&search=<?php echo urlencode($search); ?>">Material Type</a></th>
-                <th><a href="?sort=price&order=<?php echo $order === 'ASC' ? 'DESC' : 'ASC'; ?>&search=<?php echo urlencode($search); ?>">Price</a></th>
-                <th><a href="?sort=last_updated&order=<?php echo $order === 'ASC' ? 'DESC' : 'ASC'; ?>&search=<?php echo urlencode($search); ?>">Last Updated</a></th>
+                <th><a href="?sort=district_id&order=<?php echo $order === 'ASC' ? 'DESC' : 'ASC'; ?>">District</a></th>
+                <th><a href="?sort=material_id&order=<?php echo $order === 'ASC' ? 'DESC' : 'ASC'; ?>">Material</a></th>
+                <th><a href="?sort=low_price&order=<?php echo $order === 'ASC' ? 'DESC' : 'ASC'; ?>">Low Price</a></th>
+                <th><a href="?sort=medium_price&order=<?php echo $order === 'ASC' ? 'DESC' : 'ASC'; ?>">Medium Price</a></th>
+                <th><a href="?sort=high_price&order=<?php echo $order === 'ASC' ? 'DESC' : 'ASC'; ?>">High Price</a></th>
+                <th><a href="?sort=last_updated&order=<?php echo $order === 'ASC' ? 'DESC' : 'ASC'; ?>">Last Updated</a></th>
                 <th>Actions</th>
             </tr>
             <?php foreach ($prices as $price): ?>
                 <tr>
                     <td><?php echo htmlspecialchars($price['district_name']); ?></td>
                     <td><?php echo htmlspecialchars($price['material_name']); ?></td>
-                    <td><?php echo htmlspecialchars($price['material_type']); ?></td>
-                    <td><?php echo number_format($price['price'], 2); ?></td>
+                    <td><?php echo number_format($price['low_price'], 2); ?></td>
+                    <td><?php echo number_format($price['medium_price'], 2); ?></td>
+                    <td><?php echo number_format($price['high_price'], 2); ?></td>
                     <td><?php echo $price['last_updated']; ?></td>
                     <td>
                         <a href="#" class="edit-btn" 
                            data-district-id="<?php echo $price['district_id']; ?>" 
                            data-material-id="<?php echo $price['material_id']; ?>" 
-                           data-material-type="<?php echo htmlspecialchars($price['material_type']); ?>"
-                           data-price="<?php echo $price['price']; ?>">Edit</a>
+                           data-low-price="<?php echo $price['low_price']; ?>" 
+                           data-medium-price="<?php echo $price['medium_price']; ?>" 
+                           data-high-price="<?php echo $price['high_price']; ?>">Edit</a>
                         <form method="POST" style="display:inline;">
                             <input type="hidden" name="district_id" value="<?php echo $price['district_id']; ?>">
                             <input type="hidden" name="material_id" value="<?php echo $price['material_id']; ?>">
@@ -204,13 +201,11 @@ $prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </table>
 
         <!-- Pagination -->
-        <div class="pagination">
-            <?php
-            for ($i = 1; $i <= $total_pages; $i++) {
-                echo "<a href='?page=$i&sort=$sort&order=$order&search=" . urlencode($search) . "' " . ($i === $page ? 'style="font-weight:bold;"' : '') . ">$i</a> ";
-            }
-            ?>
-        </div>
+        <?php
+        for ($i = 1; $i <= $total_pages; $i++) {
+            echo "<a href='?page=$i&sort=$sort&order=$order&search=" . urlencode($search) . "'>$i</a> ";
+        }
+        ?>
 
         <!-- Edit Modal -->
         <div class="overlay"></div>
@@ -220,8 +215,9 @@ $prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <form method="POST">
                 <input type="hidden" name="district_id" id="edit-district-id">
                 <input type="hidden" name="material_id" id="edit-material-id">
-                <input type="text" name="material_type" id="edit-material-type" placeholder="Material Type (e.g., Fly Ash Brick)" required>
-                <input type="number" step="0.01" name="price" id="edit-price" placeholder="Price" required>
+                <input type="number" step="0.01" name="low_price" id="edit-low-price" required>
+                <input type="number" step="0.01" name="medium_price" id="edit-medium-price" required>
+                <input type="number" step="0.01" name="high_price" id="edit-high-price" required>
                 <input type="submit" name="edit" value="Save Changes">
             </form>
         </div>
@@ -233,13 +229,15 @@ $prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 e.preventDefault();
                 const districtId = this.getAttribute('data-district-id');
                 const materialId = this.getAttribute('data-material-id');
-                const materialType = this.getAttribute('data-material-type');
-                const price = this.getAttribute('data-price');
+                const lowPrice = this.getAttribute('data-low-price');
+                const mediumPrice = this.getAttribute('data-medium-price');
+                const highPrice = this.getAttribute('data-high-price');
 
                 document.getElementById('edit-district-id').value = districtId;
                 document.getElementById('edit-material-id').value = materialId;
-                document.getElementById('edit-material-type').value = materialType;
-                document.getElementById('edit-price').value = price;
+                document.getElementById('edit-low-price').value = lowPrice;
+                document.getElementById('edit-medium-price').value = mediumPrice;
+                document.getElementById('edit-high-price').value = highPrice;
 
                 document.querySelector('.edit-modal').classList.add('active');
                 document.querySelector('.overlay').classList.add('active');

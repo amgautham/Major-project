@@ -1,122 +1,73 @@
 <?php
+// cost_estimation.php
+
 // Database connection
-$conn = new mysqli("localhost", "root", "", "low_cost_housing");
+$conn = new mysqli("localhost", "root", "", "buildwise");
 
 // Check if the connection is successful
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch districts for the dropdown menu
-$districts_result = $conn->query("SELECT district_id, district_name FROM districts");
+/**
+ * getCategoryQuantity
+ * Returns how much area (or quantity) is needed for each category.
+ * 
+ * @param string $category   E.g., "BATHROOM FLOORING", "BATHROOM WALL", "CEILING", etc.
+ * @param float  $houseArea  The total house area (sq.ft) user entered.
+ */
+function getCategoryQuantity($category, $houseArea) {
+    $cat = strtoupper($category);
 
-// Initialize variables
-$area = $building_type = $district_id = 0;
-$materials = [];
-$costs = [];
-$total_cost = ['low' => 0, 'medium' => 0, 'high' => 0];
+    switch ($cat) {
+        case 'BATHROOM FLOORING':
+            $bathFloorArea = $houseArea * 0.08;
+            $tilesNeeded = ($bathFloorArea / 4.0) * 1.1;
+            return ceil($tilesNeeded);
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Get user input
-    $area = (float)$_POST['area'];
-    $building_type = (int)$_POST['building_type'];
-    $district_id = (int)$_POST['district_id'];
+        case 'BATHROOM WALL':
+            $bathWallArea = ($houseArea * 0.08) * 3;
+            $tilesNeeded = $bathWallArea * 1.1;
+            return ceil($tilesNeeded);
 
-    /*
-     * Material Estimation Rates based on Building Type
-     * The rates are per square foot.
-     * Example: Cement rate = 0.4 bags per sq. ft.
-     */
-    $estimation_rates = [
-        1 => [
-            "cement" => 0.4,
-            "sand" => 0.6,
-            "aggregate" => 0.8,
-            "bricks" => 6,
-            "steel" => 2,
-            "flooring" => 1.1,
-            "doors" => 0.03,
-            "windows" => 0.02,
-            "electrical fittings" => 0.015
-        ],
-        2 => [
-            "cement" => 0.45,
-            "sand" => 0.65,
-            "aggregate" => 0.9,
-            "bricks" => 7,
-            "steel" => 2.5,
-            "flooring" => 1.15,
-            "doors" => 0.035,
-            "windows" => 0.025,
-            "electrical fittings" => 0.02
-        ],
-        3 => [
-            "cement" => 0.5,
-            "sand" => 0.7,
-            "aggregate" => 1.0,
-            "bricks" => 8,
-            "steel" => 3,
-            "flooring" => 1.2,
-            "doors" => 0.04,
-            "windows" => 0.03,
-            "electrical fittings" => 0.025
-        ]
-    ];
+        case 'CEILING':
+            return ceil($houseArea);
 
-    // Calculate material quantities based on area and rates
-    $material_quantity = [];
-    foreach ($estimation_rates[$building_type] as $material => $rate) {
-        $material_quantity[strtolower($material)] = round($area * $rate, 2);
-    }
+        case 'FLOORING':
+            return ceil($houseArea);
 
-    /*
-     * Fetch material prices from the database
-     * The LEFT JOIN ensures we retrieve price details based on the selected district.
-     */
-    $sql = "SELECT m.material_id, m.material_name, mp.low_price, mp.medium_price, mp.high_price
-            FROM materials m
-            LEFT JOIN material_prices mp ON m.material_id = mp.material_id AND mp.district_id = ?
-            WHERE m.material_name IN ('Aggregate', 'Bricks', 'Cement', 'Doors', 'Electrical Fittings', 'Flooring', 'Sand', 'Steel', 'Windows')";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $district_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+        case 'KITCHEN CABINETS':
+            $cabinetQty = $houseArea * 0.10;
+            return ceil($cabinetQty);
 
-    while ($row = $result->fetch_assoc()) {
-        $material_key = strtolower($row['material_name']); // Normalize material names to lowercase
-        $materials[] = $row;
+        case 'KITCHEN COUNTERTOPS':
+            $counterArea = $houseArea * 0.05;
+            return ceil($counterArea);
 
-        // Check if the material has a calculated quantity, otherwise set cost to 0
-        if (isset($material_quantity[$material_key])) {
-            /*
-             * Cost Calculation:
-             * Cost = Quantity × Price
-             * Three price ranges: Low, Medium, and High
-             */
-            $costs[$row['material_id']] = [
-                'low' => $row['low_price'] * $material_quantity[$material_key],
-                'medium' => $row['medium_price'] * $material_quantity[$material_key],
-                'high' => $row['high_price'] * $material_quantity[$material_key]
-            ];
+        case 'KITCHEN FLOORING':
+            $kitchFloor = $houseArea * 0.07;
+            return ceil($kitchFloor);
 
-            // Sum up the total estimated costs for all materials
-            $total_cost['low'] += $costs[$row['material_id']]['low'];
-            $total_cost['medium'] += $costs[$row['material_id']]['medium'];
-            $total_cost['high'] += $costs[$row['material_id']]['high'];
-        } else {
-            $costs[$row['material_id']] = ['low' => 0, 'medium' => 0, 'high' => 0];
-        }
+        case 'KITCHEN WALL TILES':
+            $kitchWall = ($houseArea * 0.07) * 3;
+            $tilesNeeded = $kitchWall * 1.1;
+            return ceil($tilesNeeded);
+
+        case 'ROOFING':
+            $roofArea = $houseArea * 1.1;
+            return ceil($roofArea);
+
+        default:
+            return ceil($houseArea);
     }
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <title>Building Estimation</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .container {
             max-width: 5000px;
@@ -176,7 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             outline: none;
         }
 
-        button.next-button {
+        button.next-button, input[type="submit"] {
             background-color: #fdd835;
             color: black;
             font-weight: bold;
@@ -188,11 +139,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             transition: background-color 0.3s ease;
         }
 
-        button.next-button:hover {
+        button.next-button:hover, input[type="submit"]:hover {
             background-color: #fbc02d;
         }
 
-        /* New Table Styles */
         table {
             width: 100%;
             max-width: 900px;
@@ -232,19 +182,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             color: #555;
         }
 
-        .material-row input[type="radio"] {
-            margin: 0 5px 0 10px;
-            vertical-align: middle;
-        }
-
         .row-cost {
             font-weight: bold;
             color: #2c3e50;
         }
 
-        /* Responsive Design */
         @media (max-width: 600px) {
-
             table,
             th,
             td {
@@ -264,218 +207,222 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
     </style>
-    <script>
-        function updateTotalCost() {
-            let total = 0;
-            document.querySelectorAll('.material-row').forEach(function(row) {
-                let materialId = row.getAttribute('data-material-id');
-                let selectedQuality = row.querySelector('input[name="quality_' + materialId + '"]:checked').value;
-                let costInput = document.getElementById(selectedQuality + '_cost_' + materialId);
-                let cost = parseFloat(costInput.value);
-                row.querySelector('.row-cost').innerText = cost.toFixed(2);
-                total += cost;
-            });
-            document.getElementById('total_cost').innerText = total.toFixed(2);
-        }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body class="container">
     <h1>Estimate Building Cost</h1>
     <form method="post" class="calculator-form">
         <div class="form-group">
             <label>Enter Area (sq. ft.):</label>
-            <input type="number" name="area" required>
+            <input type="number" step="any" name="area" 
+                   value="<?php echo isset($_POST['area']) ? htmlspecialchars($_POST['area']) : ''; ?>" required>
         </div>
-
         <div class="form-group">
             <label>Select Building Type:</label>
-            <select name="building_type" required>
-                <option value="1">1BHK</option>
-                <option value="2">2BHK</option>
-                <option value="3">3BHK</option>
+            <select name="bhk" required>
+                <option value="1" <?php if(isset($_POST['bhk']) && $_POST['bhk'] == "1") echo 'selected'; ?>>1 BHK</option>
+                <option value="2" <?php if(isset($_POST['bhk']) && $_POST['bhk'] == "2") echo 'selected'; ?>>2 BHK</option>
+                <option value="3" <?php if(isset($_POST['bhk']) && $_POST['bhk'] == "3") echo 'selected'; ?>>3 BHK</option>
             </select>
         </div>
-
         <div class="form-group">
             <label>Select District:</label>
             <select name="district_id" required>
                 <option value="">-- Select District --</option>
-                <?php while ($row = $districts_result->fetch_assoc()): ?>
-                    <option value="<?= $row['district_id']; ?>" <?= ($row['district_id'] == $district_id) ? 'selected' : ''; ?>>
-                        <?= htmlspecialchars($row['district_name']); ?>
-                    </option>
-                <?php endwhile; ?>
+                <?php
+                $districts_query = "SELECT * FROM districts";
+                $districts_result = $conn->query($districts_query);
+                while($row = $districts_result->fetch_assoc()) {
+                    $selected = (isset($_POST['district_id']) && $_POST['district_id'] == $row['district_id']) ? 'selected' : '';
+                    echo "<option value='{$row['district_id']}' $selected>{$row['district_name']}</option>";
+                }
+                ?>
             </select>
         </div>
 
-        <button type="submit" class="next-button">Get Estimation</button>
+        <?php
+        // For cost breakdown
+        $breakdown = array();
+
+        // If user clicked "Load Materials" or "Calculate Estimation"
+        if (isset($_POST['load_materials']) || isset($_POST['calculate_estimation'])) {
+            $district_id = intval($_POST['district_id']);
+            $bhk = intval($_POST['bhk']);
+            $area = floatval($_POST['area']);
+
+            echo "<h3>Materials for Selected District</h3>";
+            
+            // Query distinct materials for chosen district
+            $query = "SELECT DISTINCT m.material_id, m.material_name 
+                      FROM materials m 
+                      JOIN material_prices mp ON m.material_id = mp.material_id
+                      WHERE mp.district_id = $district_id";
+            $result = $conn->query($query);
+            
+            if ($result && $result->num_rows > 0) {
+                echo "<table>";
+                echo "<tr><th>Material (Category)</th><th>Type</th><th>Quantity</th><th>Cost (₹)</th></tr>";
+
+                // Define material images
+                $material_images = [
+                    'cement' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-ceme.png',
+                    'steel' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-stee.png',
+                    'bricks' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-bric.png',
+                    'aggregate' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-aggr.png',
+                    'sand' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-sand.png',
+                    'flooring' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-floo.png',
+                    'windows' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-wind.png',
+                    'doors' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-door.png',
+                    'electrical fittings' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-elec.png',
+                    'bathroom flooring' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-floo.png',
+                    'bathroom wall' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-floo.png',
+                    'ceiling' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-floo.png',
+                    'kitchen cabinets' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-door.png',
+                    'kitchen countertops' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-floo.png',
+                    'kitchen flooring' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-floo.png',
+                    'kitchen wall tiles' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-floo.png',
+                    'roofing' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-floo.png'
+                ];
+
+                while ($row = $result->fetch_assoc()) {
+                    $material_id = $row['material_id'];
+                    $material_name = $row['material_name'];
+
+                    // Get available types & prices for this material
+                    $types_query = "SELECT material_type, price 
+                                    FROM material_prices 
+                                    WHERE district_id = $district_id 
+                                      AND material_id = $material_id";
+                    $types_result = $conn->query($types_query);
+
+                    $options = "<option value=''>Select Type</option>";
+                    while ($type = $types_result->fetch_assoc()) {
+                        $selected_value = "";
+                        if (isset($_POST['selected_type'][$material_id]) && 
+                            $_POST['selected_type'][$material_id] == $type['price']) {
+                            $selected_value = "selected";
+                        }
+                        $options .= "<option value='{$type['price']}' $selected_value>{$type['material_type']}</option>";
+                    }
+
+                    // Determine user-selected price
+                    $selected_price = isset($_POST['selected_type'][$material_id])
+                        ? floatval($_POST['selected_type'][$material_id])
+                        : 0;
+
+                    // Calculate quantity from category formula
+                    $quantity = getCategoryQuantity($material_name, $area);
+
+                    // Final cost = quantity × price × BHK
+                    $cost = $quantity * $selected_price * $bhk;
+
+                    // Save for chart
+                    $breakdown[] = array(
+                        'material_name' => $material_name,
+                        'cost' => $cost
+                    );
+
+                    $material_key = strtolower($material_name);
+                    $image_url = isset($material_images[$material_key]) ? $material_images[$material_key] : '';
+
+                    echo "<tr>
+                            <td>";
+                    if ($image_url) {
+                        echo "<img src='$image_url' alt='" . htmlspecialchars($material_name) . "' style='width: 30px; height: 30px; vertical-align: middle; margin-right: 10px;'>";
+                    }
+                    echo htmlspecialchars($material_name) . "</td>
+                            <td>
+                                <select name='selected_type[$material_id]'>
+                                    $options
+                                </select>
+                            </td>
+                            <td>$quantity</td>
+                            <td class='row-cost'>" . number_format($cost, 2) . "</td>
+                          </tr>";
+                }
+                echo "</table>";
+            } else {
+                echo "<p>No materials found for the selected district.</p>";
+            }
+        }
+
+        // If "Calculate Estimation" pressed, sum total cost & display chart
+        if (isset($_POST['calculate_estimation'])) {
+            $bhk = intval($_POST['bhk']);
+            $area = floatval($_POST['area']);
+            $total = 0;
+
+            foreach ($breakdown as $item) {
+                $total += $item['cost'];
+            }
+            echo "<h3>Total Estimated Cost: ₹ <span id='total_cost'>" . number_format($total, 2) . "</span></h3>";
+
+            // Prepare data for the chart
+            $labels = array();
+            $costValues = array();
+            foreach ($breakdown as $item) {
+                if ($item['cost'] > 0) { // Only include non-zero costs
+                    $labels[] = $item['material_name'];
+                    $costValues[] = $item['cost'];
+                }
+            }
+        }
+        ?>
+
+        <?php
+        // Display correct button
+        if (isset($_POST['load_materials']) || isset($_POST['calculate_estimation'])) {
+            echo "<input type='submit' name='calculate_estimation' value='Calculate Estimation'>";
+        } else {
+            echo "<input type='submit' name='load_materials' value='Load Materials'>";
+        }
+        ?>
     </form>
 
-    <?php if (!empty($materials)): ?>
-        <h3>Estimation Result</h3>
-        <table>
-            <tr>
-                <th>Material</th>
-                <th>Quantity</th>
-                <th>Quality</th>
-                <th>Cost (₹)</th>
-            </tr>
-            <?php
-            // Define image URLs for each material
-            $material_images = [
-                'cement' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-ceme.png',
-                'steel' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-stee.png',
-                'bricks' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-bric.png',
-                'aggregate' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-aggr.png',
-                'sand' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-sand.png',
-                'flooring' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-floo.png',
-                'windows' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-wind.png',
-                'doors' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-door.png',
-                'electrical fittings' => 'https://www.ultratechcement.com/content/dam/ultratechcement/cost-calculator/store-icon-elec.png'
-            ];
-
-            foreach ($materials as $mat):
-                $material_key = strtolower($mat['material_name']);
-                $image_url = isset($material_images[$material_key]) ? $material_images[$material_key] : '';
-            ?>
-                <tr class="material-row" data-material-id="<?= $mat['material_id']; ?>">
-                    <td>
-                        <?php if ($image_url): ?>
-                            <img src="<?= $image_url ?>" alt="<?= htmlspecialchars($mat['material_name']); ?>" style="width: 30px; height: 30px; vertical-align: middle; margin-right: 10px;">
-                        <?php endif; ?>
-                        <?= htmlspecialchars($mat['material_name']); ?>
-                    </td>
-                    <td>
-                        <?= isset($material_quantity[$material_key]) ? $material_quantity[$material_key] : 'N/A'; ?>
-                    </td>
-                    <td>
-                        <input type="radio" name="quality_<?= $mat['material_id']; ?>" value="low" onclick="updateTotalCost()" checked> Low
-                        <input type="radio" name="quality_<?= $mat['material_id']; ?>" value="medium" onclick="updateTotalCost()"> Medium
-                        <input type="radio" name="quality_<?= $mat['material_id']; ?>" value="high" onclick="updateTotalCost()"> High
-                    </td>
-                    <td>
-                        <span class="row-cost"><?= number_format($costs[$mat['material_id']]['low'], 2); ?></span>
-                    </td>
-                    <input type="hidden" id="low_cost_<?= $mat['material_id']; ?>" value="<?= $costs[$mat['material_id']]['low']; ?>">
-                    <input type="hidden" id="medium_cost_<?= $mat['material_id']; ?>" value="<?= $costs[$mat['material_id']]['medium']; ?>">
-                    <input type="hidden" id="high_cost_<?= $mat['material_id']; ?>" value="<?= $costs[$mat['material_id']]['high']; ?>">
-                </tr>
-            <?php endforeach; ?>
-        </table>
-
-        <h3>Total Estimated Cost: ₹ <span id="total_cost"><?= number_format($total_cost['low'], 2); ?></span></h3>
-
-        <!-- Add Donut Chart -->
+    <?php if (isset($_POST['calculate_estimation']) && !empty($labels)): ?>
         <h3>Cost Breakdown by Category (%)</h3>
-        <div style="max-width: 800px; margin: 20px auto; width: 100%;"> <!-- Increased max-width to 800px -->
-            <canvas id="costBreakdownChart" width="800" height="400"></canvas> <!-- Explicit width and height -->
+        <div style="max-width: 800px; margin: 20px auto; width: 100%;">
+            <canvas id="costBreakdownChart" width="800" height="400"></canvas>
         </div>
 
-        <!-- Include Chart.js -->
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
-            // Function to update total cost and chart
-            function updateTotalCostAndChart() {
-                let total = 0;
-                let costsByCategory = {
-                    'Brickwork & Plastering': 0, // Bricks, Sand
-                    'Flooring & Tiling': 0, // Flooring
-                    'Electric Wiring': 0, // Electrical Fittings
-                    'Water Supply & Plumbing': 0, // Placeholder (not directly mapped)
-                    'Door': 0, // Doors
-                    'Roof Slab': 0, // Steel
-                    'RCC Work - Columns & Slabs': 0, // Cement, Aggregate
-                    'Footing & Foundation': 0, // Placeholder (not directly mapped)
-                    'Excavation': 0, // Placeholder (not directly mapped)
-                    'Home Design & Approval': 0 // Placeholder (not directly mapped)
-                };
+            var labels = <?php echo json_encode($labels); ?>;
+            var costValues = <?php echo json_encode($costValues); ?>;
 
-                document.querySelectorAll('.material-row').forEach(function(row) {
-                    let materialId = row.getAttribute('data-material-id');
-                    let materialName = row.cells[0].textContent.trim().toLowerCase();
-                    let selectedQuality = row.querySelector('input[name="quality_' + materialId + '"]:checked').value;
-                    let costInput = document.getElementById(selectedQuality + '_cost_' + materialId);
-                    let cost = parseFloat(costInput.value);
-                    row.querySelector('.row-cost').innerText = cost.toFixed(2);
-                    total += cost;
+            // Calculate total for percentage
+            var totalCost = costValues.reduce((a, b) => a + b, 0);
+            var percentages = costValues.map(cost => ((cost / totalCost) * 100).toFixed(2));
 
-                    // Map materials to chart categories
-                    if (materialName.includes('bricks') || materialName.includes('sand')) {
-                        costsByCategory['Brickwork & Plastering'] += cost;
-                    } else if (materialName.includes('flooring')) {
-                        costsByCategory['Flooring & Tiling'] += cost;
-                    } else if (materialName.includes('electrical fittings')) {
-                        costsByCategory['Electric Wiring'] += cost;
-                    } else if (materialName.includes('doors')) {
-                        costsByCategory['Door'] += cost;
-                    } else if (materialName.includes('steel')) {
-                        costsByCategory['Roof Slab'] += cost;
-                    } else if (materialName.includes('cement') || materialName.includes('aggregate')) {
-                        costsByCategory['RCC Work - Columns & Slabs'] += cost;
-                    }
-                    // Note: Windows are not directly mapped to any category in the chart
-                });
-
-                document.getElementById('total_cost').innerText = total.toFixed(2);
-
-                // Calculate percentages
-                let percentages = [];
-                let labels = [];
-                for (let category in costsByCategory) {
-                    if (costsByCategory[category] > 0) { // Only include categories with non-zero costs
-                        let percentage = (costsByCategory[category] / total) * 100;
-                        percentages.push(percentage.toFixed(2));
-                        labels.push(category);
-                    }
-                }
-
-                // Update or create the chart
-                const ctx = document.getElementById('costBreakdownChart').getContext('2d');
-                if (window.costChart) {
-                    window.costChart.destroy(); // Destroy the existing chart if it exists
-                }
-                window.costChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: percentages,
-                            backgroundColor: [
-                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
-                                '#9966FF', '#FF9F40', '#C9CBCF', '#8BC34A',
-                                '#607D8B', '#F06292' // Colors matching the chart in the image
-                            ],
-                            borderWidth: 1
-                        }]
+            const ctx = document.getElementById('costBreakdownChart').getContext('2d');
+            if (window.costChart) {
+                window.costChart.destroy();
+            }
+            window.costChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: percentages,
+                        backgroundColor: [
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                            '#9966FF', '#FF9F40', '#C9CBCF', '#8BC34A',
+                            '#607D8B', '#F06292'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' },
+                        title: { display: true, text: 'Total Estimated Cost (INR)' }
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false, // Allow custom size
-                        plugins: {
-                            legend: {
-                                position: 'right'
-                            },
-                            title: {
-                                display: true,
-                                text: 'Total Estimated Cost (INR)'
-                            }
-                        },
-                        cutout: '50%' // Makes it a donut chart
-                    }
-                });
-            }
-
-            // Initial call to set up the chart
-            document.addEventListener('DOMContentLoaded', updateTotalCostAndChart);
-
-            // Update the existing updateTotalCost function to also update the chart
-            function updateTotalCost() {
-                updateTotalCostAndChart();
-            }
+                    cutout: '50%'
+                }
+            });
         </script>
     <?php endif; ?>
 </body>
-
 </html>
 <?php $conn->close(); ?>
