@@ -72,11 +72,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "<h2>$a1</h2>" ;
         ?>
       <div class="forget">
-        <label for="remember">
-          <input type="checkbox" id="remember">
-          <p>Remember me</p>
-        </label>
-        <a href="#">Forgot password?</a>
+        
+        
       </div>
       <button type="submit">Log In</button>
       <div class="register">
