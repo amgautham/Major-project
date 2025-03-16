@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 16, 2025 at 05:41 PM
+-- Generation Time: Mar 16, 2025 at 05:44 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -263,7 +263,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `user_type`) VALUES
-(23, 'oggy', '$2y$10$T2L3Zw5FWhVwd2A0ZlVenO4puv6uBKq3AXOTAoks77kXEJVkW8jHC', 'user');
+(23, 'oggy', '$2y$10$T2L3Zw5FWhVwd2A0ZlVenO4puv6uBKq3AXOTAoks77kXEJVkW8jHC', 'user'),
+(24, 'admin', '$2y$10$IGQ1v2CWnVg8JX98HlCRUOVyzSLNCNQgKYqUifdDD9axou4U9Heb2', 'admin');
 
 --
 -- Indexes for dumped tables
@@ -348,7 +349,7 @@ ALTER TABLE `material_prices`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- Constraints for dumped tables
