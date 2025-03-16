@@ -6,7 +6,27 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
     header("Location: /Major-project/admin/login.php");
     exit();
 }
+
+// Database connection (assuming db_connect.php is used elsewhere; we'll use a direct PDO connection here for simplicity)
+$host = 'localhost';
+$dbname = 'buildwise';
+$username = 'root';
+$password = '';
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // Count unread messages
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM contact_messages WHERE status = 'unread'");
+    $stmt->execute();
+    $unread_count = $stmt->fetchColumn();
+} catch (PDOException $e) {
+    // Handle error (log it or display a generic message in production)
+    $unread_count = 0; // Default to 0 if query fails
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -118,6 +138,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative; /* For notification badge positioning */
         }
 
         .tile:hover {
@@ -132,10 +153,30 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
             margin: 0;
             color: #2c3e50; /* Dark blue */
             transition: color 0.3s;
+            position: relative; /* Ensure text stays above badge */
+            z-index: 1; /* Keep text above badge */
         }
 
         .tile:hover h2 {
             color: white;
+        }
+
+        /* Notification badge */
+        .notification-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #e74c3c; /* Red for unread notifications */
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            display: <?php echo $unread_count > 0 ? 'flex' : 'none'; ?>;
         }
 
         /* Responsive design */
@@ -168,6 +209,14 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
             .tile h2 {
                 font-size: 16px;
             }
+
+            .notification-badge {
+                top: 5px;
+                right: 5px;
+                width: 18px;
+                height: 18px;
+                font-size: 10px;
+            }
         }
     </style>
 </head>
@@ -190,6 +239,12 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'admin') {
             </div>
             <div class="tile" onclick="navigateTo('../admin/material_prices.php')">
                 <h2>Material Prices</h2>
+            </div>
+            <div class="tile" onclick="navigateTo('../admin/feedback.php')">
+                <h2>FeedBacks</h2>
+                <?php if ($unread_count > 0): ?>
+                    <div class="notification-badge"><?php echo $unread_count; ?></div>
+                <?php endif; ?>
             </div>
         </div> 
     </div>
