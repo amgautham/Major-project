@@ -246,6 +246,9 @@ try {
                     <div class="notification-badge"><?php echo $unread_count; ?></div>
                 <?php endif; ?>
             </div>
+            <div class="tile" onclick="navigateTo('../admin/add_delers.php')">
+                <h2>Add Delers</h2>
+            </div>
         </div> 
     </div>
 
