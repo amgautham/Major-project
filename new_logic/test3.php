@@ -13,78 +13,39 @@ if ($conn->connect_error) {
  * 
  * @param string $category   E.g., "BATHROOM FLOORING", "BATHROOM WALL", "CEILING", etc.
  * @param float  $houseArea  The total house area (sq.ft) user entered.
- * 
- * The formulas below are just EXAMPLES:
- * - BATHROOM FLOORING => ~8% of house area is bathrooms; tile size 2×2 => 4 sq.ft each + 10% wastage
- * - BATHROOM WALL    => ~8% of house area for bathrooms × 3 for walls, tile size 1 sq.ft + 10% wastage
- * - CEILING          => ~100% of house area for a single-story home
- * - FLOORING         => ~100% of house area
- * - KITCHEN CABINETS => ~10% of house area as a rough guess for cabinets
- * - KITCHEN COUNTERTOPS => ~5% of house area for counters
- * - KITCHEN FLOORING => ~7% of house area for kitchen floor
- * - KITCHEN WALL TILES => ~7% of house area × 3 for walls, tile size 1 sq.ft + 10% wastage
- * - ROOFING          => ~houseArea × 1.1 for overhang
  */
 function getCategoryQuantity($category, $houseArea) {
-    // Convert to uppercase or something consistent for matching
     $cat = strtoupper($category);
-
     switch ($cat) {
         case 'BATHROOM FLOORING':
-            // ~8% of total area for bathrooms
             $bathFloorArea = $houseArea * 0.08; 
-            // 2×2 ft tile => 4 sq.ft each
-            // +10% wastage
             $tilesNeeded = ($bathFloorArea / 4.0) * 1.1;
             return ceil($tilesNeeded);
-
         case 'BATHROOM WALL':
-            // ~8% of house area for bathrooms, times 3 for walls
-            // tile size 1 sq.ft, +10% wastage
             $bathWallArea = ($houseArea * 0.08) * 3;
             $tilesNeeded = $bathWallArea * 1.1; 
             return ceil($tilesNeeded);
-
         case 'CEILING':
-            // Assume ceiling ~100% of house area
             return ceil($houseArea);
-
         case 'FLOORING':
-            // Main flooring ~100% of house area
             return ceil($houseArea);
-
         case 'KITCHEN CABINETS':
-            // EXAMPLE: ~10% of house area used for cabinets
-            // This is quite rough. You might do linear feet instead.
             $cabinetQty = $houseArea * 0.10;
             return ceil($cabinetQty);
-
         case 'KITCHEN COUNTERTOPS':
-            // EXAMPLE: ~5% of house area for counters
             $counterArea = $houseArea * 0.05;
             return ceil($counterArea);
-
         case 'KITCHEN FLOORING':
-            // EXAMPLE: ~7% of house area for kitchen floor
-            // tile size 4 sq.ft if you want? 
-            // For simplicity, just return area portion:
             $kitchFloor = $houseArea * 0.07;
             return ceil($kitchFloor);
-
         case 'KITCHEN WALL TILES':
-            // ~7% of house area for kitchen, times 3 for walls
-            // tile size 1 sq.ft, +10% wastage
             $kitchWall = ($houseArea * 0.07) * 3;
             $tilesNeeded = $kitchWall * 1.1;
             return ceil($tilesNeeded);
-
         case 'ROOFING':
-            // EXAMPLE: ~houseArea × 1.1 for overhang
             $roofArea = $houseArea * 1.1;
             return ceil($roofArea);
-
         default:
-            // If we don't recognize the category, fallback to houseArea
             return ceil($houseArea);
     }
 }
@@ -157,7 +118,12 @@ function getCategoryQuantity($category, $houseArea) {
             
             if ($result && $result->num_rows > 0) {
                 echo "<table>";
-                echo "<tr><th>Material (Category)</th><th>Type</th><th>Cost (Quantity × Price × BHK)</th></tr>";
+                echo "<tr>
+                        <th>Material (Category)</th>
+                        <th>Type</th>
+                        <th>Quantity</th>
+                        <th>Cost (Quantity × Price × BHK)</th>
+                      </tr>";
                 while ($row = $result->fetch_assoc()) {
                     $material_id   = $row['material_id'];
                     $material_name = $row['material_name']; // e.g., "BATHROOM FLOORING", "KITCHEN CABINETS"
@@ -184,8 +150,12 @@ function getCategoryQuantity($category, $houseArea) {
                         ? floatval($_POST['selected_type'][$material_id])
                         : 0;
 
-                    // 3. Calculate quantity from category formula
-                    $quantity = getCategoryQuantity($material_name, $area);
+                    // 3. Get quantity: use user input if available, otherwise calculate from formula.
+                    if (isset($_POST['quantity'][$material_id]) && $_POST['quantity'][$material_id] !== '') {
+                        $quantity = floatval($_POST['quantity'][$material_id]);
+                    } else {
+                        $quantity = getCategoryQuantity($material_name, $area);
+                    }
 
                     // 4. Final cost = quantity × price × BHK
                     $cost = $quantity * $selected_price * $bhk;
@@ -202,6 +172,9 @@ function getCategoryQuantity($category, $houseArea) {
                                 <select name='selected_type[$material_id]'>
                                     $options
                                 </select>
+                            </td>
+                            <td>
+                                <input type='number' step='any' name='quantity[$material_id]' value='{$quantity}' />
                             </td>
                             <td>" . number_format($cost, 2) . "</td>
                           </tr>";
@@ -283,7 +256,6 @@ function getCategoryQuantity($category, $houseArea) {
                 },
                 cutout: '50%'
             }
-            
         });
     </script>
     <?php endif; ?>

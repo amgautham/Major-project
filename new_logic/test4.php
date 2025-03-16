@@ -13,78 +13,39 @@ if ($conn->connect_error) {
  * 
  * @param string $category   E.g., "BATHROOM FLOORING", "BATHROOM WALL", "CEILING", etc.
  * @param float  $houseArea  The total house area (sq.ft) user entered.
- * 
- * The formulas below are just EXAMPLES:
- * - BATHROOM FLOORING => ~8% of house area is bathrooms; tile size 2×2 => 4 sq.ft each + 10% wastage
- * - BATHROOM WALL    => ~8% of house area for bathrooms × 3 for walls, tile size 1 sq.ft + 10% wastage
- * - CEILING          => ~100% of house area for a single-story home
- * - FLOORING         => ~100% of house area
- * - KITCHEN CABINETS => ~10% of house area as a rough guess for cabinets
- * - KITCHEN COUNTERTOPS => ~5% of house area for counters
- * - KITCHEN FLOORING => ~7% of house area for kitchen floor
- * - KITCHEN WALL TILES => ~7% of house area × 3 for walls, tile size 1 sq.ft + 10% wastage
- * - ROOFING          => ~houseArea × 1.1 for overhang
  */
 function getCategoryQuantity($category, $houseArea) {
-    // Convert to uppercase or something consistent for matching
     $cat = strtoupper($category);
-
     switch ($cat) {
         case 'BATHROOM FLOORING':
-            // ~8% of total area for bathrooms
             $bathFloorArea = $houseArea * 0.08; 
-            // 2×2 ft tile => 4 sq.ft each
-            // +10% wastage
             $tilesNeeded = ($bathFloorArea / 4.0) * 1.1;
             return ceil($tilesNeeded);
-
         case 'BATHROOM WALL':
-            // ~8% of house area for bathrooms, times 3 for walls
-            // tile size 1 sq.ft, +10% wastage
             $bathWallArea = ($houseArea * 0.08) * 3;
             $tilesNeeded = $bathWallArea * 1.1; 
             return ceil($tilesNeeded);
-
         case 'CEILING':
-            // Assume ceiling ~100% of house area
             return ceil($houseArea);
-
         case 'FLOORING':
-            // Main flooring ~100% of house area
             return ceil($houseArea);
-
         case 'KITCHEN CABINETS':
-            // EXAMPLE: ~10% of house area used for cabinets
-            // This is quite rough. You might do linear feet instead.
             $cabinetQty = $houseArea * 0.10;
             return ceil($cabinetQty);
-
         case 'KITCHEN COUNTERTOPS':
-            // EXAMPLE: ~5% of house area for counters
             $counterArea = $houseArea * 0.05;
             return ceil($counterArea);
-
         case 'KITCHEN FLOORING':
-            // EXAMPLE: ~7% of house area for kitchen floor
-            // tile size 4 sq.ft if you want? 
-            // For simplicity, just return area portion:
             $kitchFloor = $houseArea * 0.07;
             return ceil($kitchFloor);
-
         case 'KITCHEN WALL TILES':
-            // ~7% of house area for kitchen, times 3 for walls
-            // tile size 1 sq.ft, +10% wastage
             $kitchWall = ($houseArea * 0.07) * 3;
             $tilesNeeded = $kitchWall * 1.1;
             return ceil($tilesNeeded);
-
         case 'ROOFING':
-            // EXAMPLE: ~houseArea × 1.1 for overhang
             $roofArea = $houseArea * 1.1;
             return ceil($roofArea);
-
         default:
-            // If we don't recognize the category, fallback to houseArea
             return ceil($houseArea);
     }
 }
@@ -140,8 +101,8 @@ function getCategoryQuantity($category, $houseArea) {
         // For cost breakdown
         $breakdown = array();
 
-        // If user clicked "Load Materials" or "Calculate Estimation"
-        if (isset($_POST['load_materials']) || isset($_POST['calculate_estimation'])) {
+        // Check if materials are to be loaded, best preference selected, or estimation calculated
+        if (isset($_POST['load_materials']) || isset($_POST['best_preference']) || isset($_POST['calculate_estimation'])) {
             $district_id = intval($_POST['district_id']);
             $bhk = intval($_POST['bhk']);
             $area = floatval($_POST['area']);
@@ -157,24 +118,50 @@ function getCategoryQuantity($category, $houseArea) {
             
             if ($result && $result->num_rows > 0) {
                 echo "<table>";
-                echo "<tr><th>Material (Category)</th><th>Type</th><th>Cost (Quantity × Price × BHK)</th></tr>";
+                echo "<tr>
+                        <th>Material (Category)</th>
+                        <th>Type</th>
+                        <th>Quantity</th>
+                        <th>Cost (Quantity × Price × BHK)</th>
+                      </tr>";
                 while ($row = $result->fetch_assoc()) {
                     $material_id   = $row['material_id'];
                     $material_name = $row['material_name']; // e.g., "BATHROOM FLOORING", "KITCHEN CABINETS"
 
-                    // 1. Get available types & prices for this material
-                    $types_query = "SELECT material_type, price 
-                                    FROM material_prices 
-                                    WHERE district_id = $district_id 
-                                      AND material_id = $material_id";
+                    // 1. Get available types & prices for this material.
+                    // If best_preference button is clicked, order by priority (lower is better)
+                    if (isset($_POST['best_preference'])) {
+                        $types_query = "SELECT material_type, price, priority 
+                                        FROM material_prices 
+                                        WHERE district_id = $district_id 
+                                          AND material_id = $material_id 
+                                        ORDER BY priority ASC";
+                    } else {
+                        $types_query = "SELECT material_type, price 
+                                        FROM material_prices 
+                                        WHERE district_id = $district_id 
+                                          AND material_id = $material_id";
+                    }
                     $types_result = $conn->query($types_query);
 
                     $options = "<option value=''>Select Type</option>";
+                    
+                    // For Best Preference, mark only the first option (lowest priority) as selected.
+                    if (isset($_POST['best_preference'])) {
+                        $first_option = true;
+                    }
                     while ($type = $types_result->fetch_assoc()) {
                         $selected_value = "";
-                        if (isset($_POST['selected_type'][$material_id]) && 
-                            $_POST['selected_type'][$material_id] == $type['price']) {
-                            $selected_value = "selected";
+                        if (isset($_POST['best_preference'])) {
+                            if ($first_option) {
+                                $selected_value = "selected";
+                                $first_option = false;
+                            }
+                        } else {
+                            if (isset($_POST['selected_type'][$material_id]) && 
+                                $_POST['selected_type'][$material_id] == $type['price']) {
+                                $selected_value = "selected";
+                            }
                         }
                         $options .= "<option value='{$type['price']}' $selected_value>{$type['material_type']}</option>";
                     }
@@ -182,12 +169,34 @@ function getCategoryQuantity($category, $houseArea) {
                     // 2. Determine user-selected price
                     $selected_price = isset($_POST['selected_type'][$material_id])
                         ? floatval($_POST['selected_type'][$material_id])
-                        : 0;
+                        : (isset($_POST['best_preference']) && isset($first_option) ? 0 : 0);
+                    // (When best preference is used, the first option is auto-selected via the dropdown.)
 
-                    // 3. Calculate quantity from category formula
-                    $quantity = getCategoryQuantity($material_name, $area);
+                    // 3. Get quantity: use user input if available, otherwise calculate from formula.
+                    if (isset($_POST['quantity'][$material_id]) && $_POST['quantity'][$material_id] !== '') {
+                        $quantity = floatval($_POST['quantity'][$material_id]);
+                    } else {
+                        $quantity = getCategoryQuantity($material_name, $area);
+                    }
 
                     // 4. Final cost = quantity × price × BHK
+                    // Use the auto-selected price if best_preference is set and no manual selection exists.
+                    if (isset($_POST['best_preference']) && empty($_POST['selected_type'][$material_id])) {
+                        // Re-run the query to get the best option price
+                        $best_query = "SELECT price FROM material_prices 
+                                       WHERE district_id = $district_id 
+                                         AND material_id = $material_id 
+                                       ORDER BY priority ASC LIMIT 1";
+                        $best_result = $conn->query($best_query);
+                        if ($best_result && $best_row = $best_result->fetch_assoc()) {
+                            $selected_price = floatval($best_row['price']);
+                        }
+                    } else {
+                        $selected_price = isset($_POST['selected_type'][$material_id])
+                            ? floatval($_POST['selected_type'][$material_id])
+                            : 0;
+                    }
+                    
                     $cost = $quantity * $selected_price * $bhk;
 
                     // Save for chart
@@ -203,6 +212,9 @@ function getCategoryQuantity($category, $houseArea) {
                                     $options
                                 </select>
                             </td>
+                            <td>
+                                <input type='number' step='any' name='quantity[$material_id]' value='{$quantity}' />
+                            </td>
                             <td>" . number_format($cost, 2) . "</td>
                           </tr>";
                 }
@@ -214,10 +226,7 @@ function getCategoryQuantity($category, $houseArea) {
 
         // If "Calculate Estimation" pressed, sum total cost & display chart
         if (isset($_POST['calculate_estimation'])) {
-            $bhk = intval($_POST['bhk']);
-            $area = floatval($_POST['area']);
             $total = 0;
-
             foreach ($breakdown as $item) {
                 $total += $item['cost'];
             }
@@ -235,11 +244,13 @@ function getCategoryQuantity($category, $houseArea) {
         
         <br>
         <?php
-        // Display correct button
-        if (isset($_POST['load_materials']) || isset($_POST['calculate_estimation'])) {
-            echo "<input type='submit' name='calculate_estimation' value='Calculate Estimation'>";
+        // Display buttons.
+        // Initially, show "Load Materials" and "Best Preference"
+        if (!isset($_POST['load_materials']) && !isset($_POST['best_preference']) && !isset($_POST['calculate_estimation'])) {
+            echo "<input type='submit' name='load_materials' value='Load Materials'> ";
+            echo "<input type='submit' name='best_preference' value='Best Preference'>";
         } else {
-            echo "<input type='submit' name='load_materials' value='Load Materials'>";
+            echo "<input type='submit' name='calculate_estimation' value='Calculate Estimation'>";
         }
         ?>
     </form>
@@ -283,7 +294,6 @@ function getCategoryQuantity($category, $houseArea) {
                 },
                 cutout: '50%'
             }
-            
         });
     </script>
     <?php endif; ?>
