@@ -60,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php
             echo "<p>$a4</p>";
         ?>
-        <label>Enter your email</label>
+        <label>Enter your username</label>
       </div>
       <div class="input-field">
         <input type="password" name="password" id="password" required>
