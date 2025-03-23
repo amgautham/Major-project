@@ -76,7 +76,7 @@ if (!isset($_SESSION['username'])) {
           <li><a href="#about" class="page-scroll">Introduction</a></li>
           <li><a href="#services" class="page-scroll">Estimator</a></li>
           <li><a href="#portfolio" class="page-scroll">Models</a></li>
-          <li><a href="#testimonials" class="page-scroll">Contact        
+          <li><a href="#testimonials" class="page-scroll">Dealers        
           </a></li>
           <li><a href="#contact" class="page-scroll">Contact us</a></li>
           <!--<li><a href="../login/logout.php" class="">Logout</a></li>!-->

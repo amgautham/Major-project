@@ -247,7 +247,7 @@ try {
                 <?php endif; ?>
             </div>
             <div class="tile" onclick="navigateTo('../admin/add_delers.php')">
-                <h2>Add Delers</h2>
+                <h2>Add Dealers</h2>
             </div>
         </div> 
     </div>
